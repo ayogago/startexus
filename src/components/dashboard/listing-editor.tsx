@@ -104,38 +104,37 @@ export function ListingEditor({ initialData: existingListing, mode = 'create' }:
   // Transform existing listing data to match form structure
   const getInitialData = (): ListingData => {
     if (mode === 'edit' && existingListing) {
+      const d = existingListing as Record<string, string | number | boolean | string[] | null | undefined>
+      const str = (v: unknown): string => typeof v === 'string' ? v : ''
+      const num2str = (v: unknown): string => v != null ? String(v) : ''
+      const parseArr = (v: unknown, fallback: string[] = []): string[] =>
+        Array.isArray(v) ? v : typeof v === 'string' ? JSON.parse(v || '[]') : fallback
+
       return {
-        title: existingListing.title || '',
-        businessType: existingListing.businessType || '',
-        category: existingListing.category || '',
-        askingPrice: existingListing.askingPrice?.toString() || '',
-        priceType: existingListing.priceType || 'ASKING',
-        revenueTtm: existingListing.revenueTtm?.toString() || '',
-        profitTtm: existingListing.profitTtm?.toString() || '',
-        mrr: existingListing.mrr?.toString() || '',
-        trafficTtm: existingListing.trafficTtm?.toString() || '',
-        monetization: Array.isArray(existingListing.monetization) ? existingListing.monetization :
-                     typeof existingListing.monetization === 'string' ? JSON.parse(existingListing.monetization || '[]') : [],
-        platform: Array.isArray(existingListing.platform) ? existingListing.platform :
-                  typeof existingListing.platform === 'string' ? JSON.parse(existingListing.platform || '[]') : [],
-        techStack: Array.isArray(existingListing.techStack) ? existingListing.techStack :
-                   typeof existingListing.techStack === 'string' ? JSON.parse(existingListing.techStack || '[]') : [],
-        establishedAt: existingListing.establishedAt ? new Date(existingListing.establishedAt).toISOString().split('T')[0] : '',
-        workloadHrsPerWk: existingListing.workloadHrsPerWk?.toString() || '',
-        teamSize: existingListing.teamSize?.toString() || '',
-        description: existingListing.description || '',
-        highlights: Array.isArray(existingListing.highlights) ? existingListing.highlights :
-                   typeof existingListing.highlights === 'string' ? JSON.parse(existingListing.highlights || '[]') : [''],
-        growthOps: Array.isArray(existingListing.growthOps) ? existingListing.growthOps :
-                   typeof existingListing.growthOps === 'string' ? JSON.parse(existingListing.growthOps || '[]') : [''],
-        risks: Array.isArray(existingListing.risks) ? existingListing.risks :
-               typeof existingListing.risks === 'string' ? JSON.parse(existingListing.risks || '[]') : [''],
-        assetsIncluded: Array.isArray(existingListing.assetsIncluded) ? existingListing.assetsIncluded :
-                       typeof existingListing.assetsIncluded === 'string' ? JSON.parse(existingListing.assetsIncluded || '[]') : [''],
-        reasonForSale: existingListing.reasonForSale || '',
-        location: existingListing.location || '',
-        siteUrl: existingListing.siteUrl || '',
-        ndaRequired: existingListing.ndaRequired || false,
+        title: str(d.title),
+        businessType: str(d.businessType),
+        category: str(d.category),
+        askingPrice: num2str(d.askingPrice),
+        priceType: (str(d.priceType) || 'ASKING') as 'ASKING' | 'OPEN_TO_OFFERS',
+        revenueTtm: num2str(d.revenueTtm),
+        profitTtm: num2str(d.profitTtm),
+        mrr: num2str(d.mrr),
+        trafficTtm: num2str(d.trafficTtm),
+        monetization: parseArr(d.monetization),
+        platform: parseArr(d.platform),
+        techStack: parseArr(d.techStack),
+        establishedAt: d.establishedAt ? new Date(d.establishedAt as string | number).toISOString().split('T')[0] : '',
+        workloadHrsPerWk: num2str(d.workloadHrsPerWk),
+        teamSize: num2str(d.teamSize),
+        description: str(d.description),
+        highlights: parseArr(d.highlights, ['']),
+        growthOps: parseArr(d.growthOps, ['']),
+        risks: parseArr(d.risks, ['']),
+        assetsIncluded: parseArr(d.assetsIncluded, ['']),
+        reasonForSale: str(d.reasonForSale),
+        location: str(d.location),
+        siteUrl: str(d.siteUrl),
+        ndaRequired: Boolean(d.ndaRequired),
       }
     }
     return initialData
