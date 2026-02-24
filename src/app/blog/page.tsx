@@ -7,6 +7,13 @@ import { formatCurrency, formatNumber } from '@/lib/utils'
 import { Calendar, Clock, Star, Search, User, ArrowRight } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { NewsletterSignup } from '@/components/blog/newsletter-signup'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Blog',
+  description: 'Insights, tips, and stories about buying and selling online businesses, SaaS acquisitions, and digital entrepreneurship.',
+  alternates: { canonical: '/blog' },
+}
 
 async function getFeaturedPosts() {
   const posts = await prisma.blogPost.findMany({
@@ -32,11 +39,13 @@ async function getFeaturedPosts() {
     take: 3,
   })
 
-  return posts.map(post => ({
-    ...post,
-    tags: JSON.parse(post.tags || '[]'),
-    categories: JSON.parse(post.categories || '[]'),
-  }))
+  return posts.map(post => {
+    let tags: string[] = []
+    let categories: string[] = []
+    try { tags = JSON.parse(post.tags || '[]') } catch {}
+    try { categories = JSON.parse(post.categories || '[]') } catch {}
+    return { ...post, tags, categories }
+  })
 }
 
 async function getRecentPosts() {
@@ -62,11 +71,13 @@ async function getRecentPosts() {
     take: 6,
   })
 
-  return posts.map(post => ({
-    ...post,
-    tags: JSON.parse(post.tags || '[]'),
-    categories: JSON.parse(post.categories || '[]'),
-  }))
+  return posts.map(post => {
+    let tags: string[] = []
+    let categories: string[] = []
+    try { tags = JSON.parse(post.tags || '[]') } catch {}
+    try { categories = JSON.parse(post.categories || '[]') } catch {}
+    return { ...post, tags, categories }
+  })
 }
 
 function formatDate(date: Date | string) {

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { sendValuationEmail } from '@/lib/email'
 import { z } from 'zod'
@@ -56,9 +58,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Send confirmation email to the requester
-    sendValuationEmail(validatedData.email, validatedData.fullName, validatedData.businessName).catch(error => {
-      console.error('Failed to send valuation confirmation email:', error)
-    })
+    sendValuationEmail(validatedData.email, validatedData.fullName, validatedData.businessName).catch(() => {})
 
     // Send notification email to admin team
     const adminEmail = process.env.ADMIN_EMAIL || 'info@startexus.com'
@@ -211,9 +211,7 @@ export async function POST(request: NextRequest) {
 
     // Don't wait for admin email to complete
     import('@/lib/email').then(({ sendEmail }) => {
-      sendEmail(adminNotification).catch(error => {
-        console.error('Failed to send admin notification:', error)
-      })
+      sendEmail(adminNotification).catch(() => {})
     })
 
     return NextResponse.json({
@@ -222,8 +220,6 @@ export async function POST(request: NextRequest) {
       requestId: valuationRequest.id,
     })
   } catch (error) {
-    console.error('Failed to process valuation request:', error)
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.errors },
@@ -241,7 +237,11 @@ export async function POST(request: NextRequest) {
 // GET endpoint to retrieve valuation requests (admin only)
 export async function GET(request: NextRequest) {
   try {
-    // For now, return basic response - would need auth check in production
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id || (session.user as any).role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const valuationRequests = await prisma.valuationRequest.findMany({
       orderBy: { requestedAt: 'desc' },
       take: 50,
@@ -249,7 +249,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ requests: valuationRequests })
   } catch (error) {
-    console.error('Failed to fetch valuation requests:', error)
     return NextResponse.json(
       { error: 'Failed to fetch requests' },
       { status: 500 }

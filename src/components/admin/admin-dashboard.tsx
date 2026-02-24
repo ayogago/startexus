@@ -132,8 +132,8 @@ export function AdminDashboard() {
       setAllListings(all.listings || [])
       setReports(reportsData.reports || [])
       setUsers(usersData.users || [])
-    } catch (error) {
-      console.error('Failed to fetch admin data:', error)
+    } catch {
+      // Failed to fetch admin data
     } finally {
       setLoading(false)
     }
@@ -151,8 +151,8 @@ export function AdminDashboard() {
         // Refresh all data to reflect changes
         fetchAdminData()
       }
-    } catch (error) {
-      console.error('Failed to moderate listing:', error)
+    } catch {
+      // Failed to moderate listing
     }
   }
 
@@ -167,8 +167,8 @@ export function AdminDashboard() {
       if (response.ok) {
         fetchAdminData()
       }
-    } catch (error) {
-      console.error('Failed to toggle listing flag:', error)
+    } catch {
+      // Failed to toggle listing flag
     }
   }
 
@@ -183,8 +183,8 @@ export function AdminDashboard() {
       if (response.ok) {
         fetchAdminData()
       }
-    } catch (error) {
-      console.error('Failed to toggle listing featured status:', error)
+    } catch {
+      // Failed to toggle listing featured status
     }
   }
 
@@ -207,8 +207,8 @@ export function AdminDashboard() {
             : user
         ))
       }
-    } catch (error) {
-      console.error('Failed to update user:', error)
+    } catch {
+      // Failed to update user
     }
   }
 
@@ -223,8 +223,8 @@ export function AdminDashboard() {
       if (response.ok) {
         setReports(reports.map(r => r.id === reportId ? { ...r, status: 'CLOSED' } : r))
       }
-    } catch (error) {
-      console.error('Failed to resolve report:', error)
+    } catch {
+      // Failed to resolve report
     }
   }
 
@@ -244,8 +244,8 @@ export function AdminDashboard() {
         setPendingListings(pendingListings.filter(l => l.id !== listingId))
         setFlaggedListings(flaggedListings.filter(l => l.id !== listingId))
       }
-    } catch (error) {
-      console.error('Failed to delete listing:', error)
+    } catch {
+      // Failed to delete listing
     }
   }
 
@@ -262,8 +262,8 @@ export function AdminDashboard() {
       if (response.ok) {
         setUsers(users.filter(u => u.id !== userId))
       }
-    } catch (error) {
-      console.error('Failed to delete user:', error)
+    } catch {
+      // Failed to delete user
     }
   }
 

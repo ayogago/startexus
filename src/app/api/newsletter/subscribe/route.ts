@@ -5,7 +5,8 @@ export async function POST(request: NextRequest) {
   try {
     const { email, name } = await request.json()
 
-    if (!email || !email.includes('@')) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!email || !emailRegex.test(email)) {
       return NextResponse.json(
         { error: 'Valid email is required' },
         { status: 400 }
@@ -47,7 +48,6 @@ export async function POST(request: NextRequest) {
       message: 'Successfully subscribed! You will receive emails when we publish new blog posts.',
     })
   } catch (error) {
-    console.error('Newsletter subscription failed:', error)
     return NextResponse.json(
       { error: 'Failed to subscribe. Please try again.' },
       { status: 500 }

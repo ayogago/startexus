@@ -2,6 +2,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, Users, TrendingUp, Globe, Award, Heart } from 'lucide-react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description: 'Learn about StartExus - the trusted marketplace for buying and selling online businesses, SaaS, and digital assets.',
+  alternates: { canonical: '/about' },
+}
 
 export default function AboutPage() {
   return (

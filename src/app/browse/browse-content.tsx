@@ -92,26 +92,26 @@ export function BrowseContent() {
       const data = await response.json()
 
       // Process listings to parse JSON fields for SQLite
+      const safeJsonParse = (val: unknown, fallback: unknown[] = []) => {
+        if (Array.isArray(val)) return val
+        if (typeof val === 'string') {
+          try { return JSON.parse(val || '[]') } catch { return fallback }
+        }
+        return fallback
+      }
+
       const processedListings = (data.listings || []).map((listing: any) => ({
         ...listing,
-        highlights: typeof listing.highlights === 'string'
-          ? JSON.parse(listing.highlights || '[]')
-          : listing.highlights || [],
-        monetization: typeof listing.monetization === 'string'
-          ? JSON.parse(listing.monetization || '[]')
-          : listing.monetization || [],
-        techStack: typeof listing.techStack === 'string'
-          ? JSON.parse(listing.techStack || '[]')
-          : listing.techStack || [],
-        platform: typeof listing.platform === 'string'
-          ? JSON.parse(listing.platform || '[]')
-          : listing.platform || []
+        highlights: safeJsonParse(listing.highlights),
+        monetization: safeJsonParse(listing.monetization),
+        techStack: safeJsonParse(listing.techStack),
+        platform: safeJsonParse(listing.platform),
       }))
 
       setListings(processedListings)
       setPagination(data.pagination || pagination)
-    } catch (error) {
-      console.error('Failed to fetch listings:', error)
+    } catch {
+      // Failed to fetch listings
     } finally {
       setLoading(false)
     }

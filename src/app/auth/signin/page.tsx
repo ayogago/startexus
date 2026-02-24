@@ -32,7 +32,6 @@ function SignInContent() {
   const handlePendingListing = async () => {
     try {
       const pendingListingData = sessionStorage.getItem('pendingListing')
-      console.log('Pending listing data from sessionStorage:', pendingListingData)
       if (pendingListingData) {
         const listingData = JSON.parse(pendingListingData)
 
@@ -56,16 +55,13 @@ function SignInContent() {
         }
 
         // Create the listing
-        console.log('Creating listing with data:', transformedData)
         const response = await fetch('/api/listings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(transformedData),
         })
 
-        console.log('Listing creation response status:', response.status)
         const responseData = await response.text()
-        console.log('Listing creation response:', responseData)
 
         if (response.ok) {
           // Clear the pending listing data
@@ -80,7 +76,6 @@ function SignInContent() {
         router.push(callbackUrl)
       }
     } catch (error) {
-      console.error('Failed to create listing:', error)
       // Still redirect to dashboard but with an error message
       router.push('/dashboard?error=Failed to create listing. Please try creating it manually.')
     }

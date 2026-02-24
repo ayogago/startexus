@@ -1,3 +1,11 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description: 'StartExus terms of service - rules and guidelines for using our online business marketplace.',
+  alternates: { canonical: '/terms' },
+}
+
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
