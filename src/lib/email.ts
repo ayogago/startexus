@@ -1,5 +1,3 @@
-import nodemailer from 'nodemailer'
-
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -9,16 +7,17 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;')
 }
 
-// Email configuration - lazily initialized to avoid issues during build
-let transporter: nodemailer.Transporter | null = null
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let transporter: any = null
 
-function getTransporter() {
+async function getTransporter() {
   if (!transporter) {
+    const nodemailer = (await import('nodemailer')).default
     const port = parseInt(process.env.EMAIL_SERVER_PORT || '587')
     transporter = nodemailer.createTransport({
       host: process.env.EMAIL_SERVER_HOST || 'smtp.gmail.com',
       port: port,
-      secure: port === 465, // true for 465 (SSL), false for other ports (TLS)
+      secure: port === 465,
       requireTLS: true,
       auth: {
         user: process.env.EMAIL_SERVER_USER,
@@ -359,7 +358,8 @@ export async function sendEmail({
   text: string
 }) {
   try {
-    const info = await getTransporter().sendMail({
+    const mailer = await getTransporter()
+    const info = await mailer.sendMail({
       from: process.env.EMAIL_FROM || 'noreply@startexus.com',
       to,
       subject,
