@@ -1,11 +1,11 @@
-// SQLite version of the schema (no enums)
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Account {
@@ -39,7 +39,7 @@ model User {
   id                String   @id @default(cuid())
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  role              String   @default("BUYER") // GUEST, BUYER, SELLER, ADMIN
+  role              String   @default("BUYER")
   email             String   @unique
   emailVerified     DateTime?
   password          String?
@@ -79,40 +79,40 @@ model Listing {
   id                String   @id @default(cuid())
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  status            String   @default("DRAFT") // DRAFT, PENDING_REVIEW, PUBLISHED, UNPUBLISHED, REJECTED
+  status            String   @default("DRAFT")
   sellerId          String
   seller            User     @relation(fields: [sellerId], references: [id])
   title             String
   slug              String   @unique
-  businessType      String   // SAAS, ECOMMERCE, AMAZON, CONTENT, MOBILE_APP, OTHER
-  category          String   // SaaS, Ecommerce, Amazon, Content, Mobile app, Other
-  isAiRelated       Boolean  @default(false) // true if business uses AI technology
-  aiTechnologies    String   @default("[]") // JSON array of AI technologies used
-  askingPrice       Int?     // in USD cents
-  priceType         String   @default("ASKING") // ASKING, OPEN_TO_OFFERS
-  revenueTtm        Int?     // cents, trailing 12 months
-  profitTtm         Int?     // cents
-  mrr               Int?     // monthly recurring revenue in cents
-  aov               Int?     // average order value in cents
-  trafficTtm        Int?     // sessions
-  monetization      String   @default("[]") // JSON array as string for SQLite
-  platform          String   @default("[]") // JSON array as string for SQLite
-  techStack         String   @default("[]") // JSON array as string for SQLite
+  businessType      String
+  category          String
+  isAiRelated       Boolean  @default(false)
+  aiTechnologies    String   @default("[]")
+  askingPrice       Int?
+  priceType         String   @default("ASKING")
+  revenueTtm        Int?
+  profitTtm         Int?
+  mrr               Int?
+  aov               Int?
+  trafficTtm        Int?
+  monetization      String   @default("[]")
+  platform          String   @default("[]")
+  techStack         String   @default("[]")
   establishedAt     DateTime?
-  workloadHrsPerWk  Int?     // owner hours per week
-  teamSize          Int?     // number of employees or contractors
+  workloadHrsPerWk  Int?
+  teamSize          Int?
   description       String
-  highlights        String   @default("[]") // JSON array as string for SQLite
-  growthOps         String   @default("[]") // JSON array as string for SQLite
-  risks             String   @default("[]") // JSON array as string for SQLite
-  assetsIncluded    String   @default("[]") // JSON array as string for SQLite
+  highlights        String   @default("[]")
+  growthOps         String   @default("[]")
+  risks             String   @default("[]")
+  assetsIncluded    String   @default("[]")
   reasonForSale     String?
   images            ListingImage[]
-  location          String?  // optional
-  confidential      Boolean  @default(false) // hide exact URL and brand if true
-  siteUrl           String?  // optional, masked if confidential
-  analyticsProofUrl String?  // optional link to GA view or screenshots
-  revenueProofUrl   String?  // optional link or upload
+  location          String?
+  confidential      Boolean  @default(false)
+  siteUrl           String?
+  analyticsProofUrl String?
+  revenueProofUrl   String?
   ndaRequired       Boolean  @default(false)
   views             Int      @default(0)
   favorites         Int      @default(0)
@@ -120,7 +120,7 @@ model Listing {
   flagged           Boolean  @default(false)
   featured          Boolean  @default(false)
   featuredAt        DateTime?
-  rejectionReason   String?  // admin feedback when rejecting a listing
+  rejectionReason   String?
   savedListings     SavedListing[]
   threads           Thread[]
 }
@@ -159,7 +159,7 @@ model ThreadParticipant {
   id       String @id @default(cuid())
   threadId String
   userId   String
-  roleInThread String // BUYER, SELLER
+  roleInThread String
   thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -172,7 +172,7 @@ model Message {
   threadId    String
   senderId    String
   body        String
-  readBy      String   @default("[]") // JSON array as string for SQLite
+  readBy      String   @default("[]")
   sender      User     @relation("UserMessages", fields: [senderId], references: [id])
   thread      Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   flagged     Boolean  @default(false)
@@ -182,10 +182,10 @@ model Report {
   id         String   @id @default(cuid())
   createdAt  DateTime @default(now())
   reporterId String
-  targetType String   // LISTING, MESSAGE, USER
+  targetType String
   targetId   String
   reason     String
-  status     String   @default("OPEN") // OPEN, UNDER_REVIEW, CLOSED
+  status     String   @default("OPEN")
   reporter   User     @relation(fields: [reporterId], references: [id])
 }
 
@@ -207,7 +207,7 @@ model ValuationRequest {
   contactEmail        String
   contactPhone        String?
   additionalInfo      String?
-  status              String   @default("PENDING") // PENDING, IN_REVIEW, COMPLETED, CANCELLED
+  status              String   @default("PENDING")
   requestedAt         DateTime @default(now())
   completedAt         DateTime?
   assignedTo          String?
@@ -220,15 +220,15 @@ model BlogPost {
   updatedAt        DateTime @updatedAt
   title            String
   slug             String   @unique
-  excerpt          String?  // Short description for previews
-  content          String   // Rich text content (HTML)
-  featuredImage    String?  // URL to featured image
-  tags             String   @default("[]") // JSON array as string for SQLite
-  categories       String   @default("[]") // JSON array as string for SQLite
-  status           String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  excerpt          String?
+  content          String
+  featuredImage    String?
+  tags             String   @default("[]")
+  categories       String   @default("[]")
+  status           String   @default("DRAFT")
   publishedAt      DateTime?
-  metaTitle        String?  // SEO meta title
-  metaDescription  String?  // SEO meta description
+  metaTitle        String?
+  metaDescription  String?
   authorId         String
   author           User     @relation(fields: [authorId], references: [id])
   views            Int      @default(0)
@@ -240,14 +240,14 @@ model BlogComment {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   content   String
-  authorId  String?  // Optional for anonymous comments
+  authorId  String?
   author    User?    @relation(fields: [authorId], references: [id])
   postId    String
   post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parentId  String?  // For nested comments
+  parentId  String?
   parent    BlogComment? @relation("CommentReplies", fields: [parentId], references: [id])
   replies   BlogComment[] @relation("CommentReplies")
-  status    String   @default("APPROVED") // PENDING, APPROVED, REJECTED
+  status    String   @default("APPROVED")
 }
 
 model NewsletterSubscriber {
@@ -255,7 +255,7 @@ model NewsletterSubscriber {
   email         String   @unique
   name          String?
   subscribedAt  DateTime @default(now())
-  status        String   @default("ACTIVE") // ACTIVE, UNSUBSCRIBED
+  status        String   @default("ACTIVE")
   unsubscribeToken String @unique @default(cuid())
   emailsSent    NewsletterEmail[]
 }
@@ -269,5 +269,5 @@ model NewsletterEmail {
   sentAt        DateTime @default(now())
   openedAt      DateTime?
   clickedAt     DateTime?
-  clickedLinks  String   @default("[]") // JSON array of clicked links
+  clickedLinks  String   @default("[]")
 }
