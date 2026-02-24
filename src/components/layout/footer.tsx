@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export function Footer() {
   return (
@@ -8,7 +9,7 @@ export function Footer() {
           <div>
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 flex-shrink-0">
-                <img src="/logo.svg" alt="StartExus Logo" className="w-full h-full" />
+                <Image src="/logo.svg" alt="StartExus" width={120} height={32} />
               </div>
               <div>
                 <span className="font-bold text-xl">StartExus</span>

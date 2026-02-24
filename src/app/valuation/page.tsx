@@ -907,6 +907,11 @@ export default function ValuationPage() {
             </div>
 
             <div className="space-y-4">
+              {errorMessage && (
+                <div className="p-3 rounded-lg bg-red-50 text-red-800 border border-red-200 text-sm">
+                  {errorMessage}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium mb-2">Full Name *</label>
                 <Input
