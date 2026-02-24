@@ -29,6 +29,7 @@ interface ProfileFormProps {
 export function ProfileForm({ user }: ProfileFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [formData, setFormData] = useState({
     name: user.name || '',
     handle: user.handle || '',
@@ -65,14 +66,13 @@ export function ProfileForm({ user }: ProfileFormProps) {
           website: updatedUser.website || '',
         })
         router.refresh()
-        alert('Profile updated successfully!')
+        setStatusMessage({ type: 'success', text: 'Profile updated successfully!' })
       } else {
         const error = await response.json()
-        alert(error.error || 'Failed to update profile')
+        setStatusMessage({ type: 'error', text: error.error || 'Failed to update profile' })
       }
     } catch (error) {
-      console.error('Failed to update profile:', error)
-      alert('Failed to update profile')
+      setStatusMessage({ type: 'error', text: 'Failed to update profile' })
     } finally {
       setIsLoading(false)
     }
@@ -220,6 +220,12 @@ export function ProfileForm({ user }: ProfileFormProps) {
                 type="url"
               />
             </div>
+
+            {statusMessage && (
+              <div className={`p-4 rounded-lg ${statusMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+                {statusMessage.text}
+              </div>
+            )}
 
             <div className="flex justify-end space-x-4">
               <Button

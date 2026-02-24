@@ -93,7 +93,7 @@ const initialData: ListingData = {
 }
 
 interface ListingEditorProps {
-  initialData?: any
+  initialData?: Record<string, unknown>
   mode?: 'create' | 'edit'
 }
 
@@ -165,13 +165,17 @@ export function ListingEditor({ initialData: existingListing, mode = 'create' }:
   }, [data])
 
   const autoSave = async () => {
+    if (mode !== 'edit' || !existingListing?.id) return
     setSaving(true)
     try {
-      // In a real app, save to draft here
-      console.log('Auto-saving...', data)
+      await fetch(`/api/listings/${existingListing.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, status: 'DRAFT' }),
+      })
       setLastSaved(new Date())
-    } catch (error) {
-      console.error('Auto-save failed:', error)
+    } catch {
+      // Auto-save failed silently
     } finally {
       setSaving(false)
     }
@@ -260,9 +264,8 @@ export function ListingEditor({ initialData: existingListing, mode = 'create' }:
       } else {
         throw new Error(mode === 'edit' ? 'Failed to update listing' : 'Failed to create listing')
       }
-    } catch (error) {
-      console.error('Failed to save listing:', error)
-      alert('Failed to save listing. Please try again.')
+    } catch {
+      // Failed to save listing
     } finally {
       setSaving(false)
     }

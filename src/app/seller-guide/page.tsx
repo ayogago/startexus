@@ -16,6 +16,13 @@ import {
   BarChart
 } from 'lucide-react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Seller Guide',
+  description: 'Complete guide to selling your online business on StartExus. Tips for pricing, listing, and closing deals.',
+  alternates: { canonical: '/seller-guide' },
+}
 
 export default function SellerGuidePage() {
   return (

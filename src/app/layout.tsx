@@ -73,9 +73,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: 'google-site-verification-code', // Replace with actual verification code
-  },
+  // verification: {
+  //   google: 'YOUR_ACTUAL_VERIFICATION_CODE',
+  // },
   icons: {
     icon: [
       {
@@ -112,6 +112,8 @@ export default function RootLayout({
             `,
           }}
         />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

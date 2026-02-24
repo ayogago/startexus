@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
     const minTraffic = searchParams.get('minTraffic')
     const workload = searchParams.get('workload')
     const sort = searchParams.get('sort') || 'newest'
-    const page = parseInt(searchParams.get('page') || '1')
-    const pageSize = parseInt(searchParams.get('pageSize') || '51')
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1)
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '51') || 51))
 
     const where: any = {
       status: 'PUBLISHED',
@@ -75,13 +75,13 @@ export async function GET(request: NextRequest) {
     // Price filters
     if (minPrice || maxPrice) {
       where.askingPrice = {}
-      if (minPrice) where.askingPrice.gte = parseInt(minPrice) * 100
-      if (maxPrice) where.askingPrice.lte = parseInt(maxPrice) * 100
+      if (minPrice) where.askingPrice.gte = (parseInt(minPrice) || 0) * 100
+      if (maxPrice) where.askingPrice.lte = (parseInt(maxPrice) || 0) * 100
     }
 
     // MRR filter
     if (minMRR) {
-      where.mrr = { gte: parseInt(minMRR) * 100 }
+      where.mrr = { gte: (parseInt(minMRR) || 0) * 100 }
     }
 
     // AI filter
@@ -94,13 +94,13 @@ export async function GET(request: NextRequest) {
     // Revenue filters
     if (minRevenue || maxRevenue) {
       where.revenueTtm = {}
-      if (minRevenue) where.revenueTtm.gte = parseInt(minRevenue) * 100
-      if (maxRevenue) where.revenueTtm.lte = parseInt(maxRevenue) * 100
+      if (minRevenue) where.revenueTtm.gte = (parseInt(minRevenue) || 0) * 100
+      if (maxRevenue) where.revenueTtm.lte = (parseInt(maxRevenue) || 0) * 100
     }
 
     // Traffic filter
     if (minTraffic) {
-      where.trafficTtm = { gte: parseInt(minTraffic) }
+      where.trafficTtm = { gte: parseInt(minTraffic) || 0 }
     }
 
     // Workload filter
@@ -191,8 +191,7 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(total / pageSize),
       },
     })
-  } catch (error) {
-    console.error('Failed to fetch listings:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch listings' },
       { status: 500 }

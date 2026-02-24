@@ -24,6 +24,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File must be an image' }, { status: 400 })
     }
 
+    // Validate file extension
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+    const ext = path.extname(file.name).toLowerCase()
+    if (!allowedExtensions.includes(ext)) {
+      return NextResponse.json({ error: 'File type not allowed. Use JPG, PNG, GIF, WebP, or SVG.' }, { status: 400 })
+    }
+
     // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 })
@@ -54,7 +61,6 @@ export async function POST(request: NextRequest) {
       size: file.size
     })
   } catch (error) {
-    console.error('Upload failed:', error)
     return NextResponse.json(
       { error: 'Upload failed' },
       { status: 500 }

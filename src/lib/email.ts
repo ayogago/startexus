@@ -4,6 +4,15 @@ import { config } from 'dotenv'
 // Load environment variables
 config()
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 // Email configuration
 const port = parseInt(process.env.EMAIL_SERVER_PORT || '587')
 const transporter = nodemailer.createTransport({
@@ -15,9 +24,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_SERVER_USER,
     pass: process.env.EMAIL_SERVER_PASSWORD,
   },
-  tls: {
-    rejectUnauthorized: false
-  }
+  tls: { rejectUnauthorized: process.env.NODE_ENV !== 'development' }
 })
 
 // Email templates
@@ -57,10 +64,10 @@ export const emailTemplates = {
           </div>
 
           <div class="content">
-            <h1 class="welcome-title">Welcome to StartExus, ${name}! 🎉</h1>
+            <h1 class="welcome-title">Welcome to StartExus, ${escapeHtml(name)}! 🎉</h1>
 
             <div class="welcome-message">
-              Thank you for joining StartExus as a <strong>${role.toLowerCase()}</strong>! You're now part of a thriving community of entrepreneurs buying and selling businesses.
+              Thank you for joining StartExus as a <strong>${escapeHtml(role.toLowerCase())}</strong>! You're now part of a thriving community of entrepreneurs buying and selling businesses.
             </div>
 
             <div class="features">
@@ -173,9 +180,9 @@ export const emailTemplates = {
             <h1 class="title">Valuation Request Confirmed! ✅</h1>
 
             <div class="message">
-              Hi ${name},<br><br>
+              Hi ${escapeHtml(name)},<br><br>
 
-              We've received your valuation request for <strong>${businessName}</strong>. Our expert team is already working on your comprehensive business analysis.
+              We've received your valuation request for <strong>${escapeHtml(businessName)}</strong>. Our expert team is already working on your comprehensive business analysis.
             </div>
 
             <div class="timeline">
@@ -267,9 +274,9 @@ export const emailTemplates = {
             <h1 class="title">Listing Submitted Successfully! 🎉</h1>
 
             <div class="message">
-              Hi ${name},<br><br>
+              Hi ${escapeHtml(name)},<br><br>
 
-              Your business listing for <strong>"${businessTitle}"</strong> has been successfully submitted and is now under review.
+              Your business listing for <strong>"${escapeHtml(businessTitle)}"</strong> has been successfully submitted and is now under review.
             </div>
 
             <div style="text-align: center;">
@@ -357,10 +364,8 @@ export async function sendEmail({
       text,
     })
 
-    console.log('Email sent successfully:', info.messageId)
     return { success: true, messageId: info.messageId }
   } catch (error) {
-    console.error('Failed to send email:', error)
     return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }
@@ -451,7 +456,7 @@ export async function sendAdminListingNotification(listingData: {
             <h3 style="color: #78350f; margin-top: 0;">Listing Details:</h3>
             <div class="detail-item">
               <span class="detail-label">Title:</span>
-              <span class="detail-value">${listingData.title}</span>
+              <span class="detail-value">${escapeHtml(listingData.title)}</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Type:</span>
@@ -463,7 +468,7 @@ export async function sendAdminListingNotification(listingData: {
             </div>
             <div class="detail-item">
               <span class="detail-label">Seller:</span>
-              <span class="detail-value">${listingData.sellerName} (${listingData.sellerEmail})</span>
+              <span class="detail-value">${escapeHtml(listingData.sellerName)} (${escapeHtml(listingData.sellerEmail)})</span>
             </div>
           </div>
 

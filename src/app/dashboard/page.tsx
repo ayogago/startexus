@@ -1,10 +1,19 @@
 import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { FileText, MessageSquare, Heart, Eye, TrendingUp } from 'lucide-react'
+
+interface Activity {
+  type: string
+  title: string
+  createdAt: Date
+  status?: string
+  views?: number
+}
 
 async function getDashboardStats(userId: string, userRole: string) {
   const stats = {
@@ -92,7 +101,7 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
 
   if (!session?.user?.id) {
-    return <div>Loading...</div>
+    redirect('/auth/signin')
   }
 
   const [stats, recentActivity] = await Promise.all([
@@ -217,7 +226,7 @@ export default async function DashboardPage() {
                   </div>
                   {activity.type === 'listing' && (
                     <div className="text-sm text-gray-500">
-                      {(activity as any).views || 0} views
+                      {(activity as Activity).views || 0} views
                     </div>
                   )}
                 </div>

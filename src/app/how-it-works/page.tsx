@@ -15,6 +15,13 @@ import {
   TrendingUp
 } from 'lucide-react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'How It Works',
+  description: 'Learn how to buy or sell an online business on StartExus. Simple steps from listing to closing the deal.',
+  alternates: { canonical: '/how-it-works' },
+}
 
 export default function HowItWorksPage() {
   return (

@@ -75,6 +75,7 @@ export default function ValuationPage() {
   const [showContactModal, setShowContactModal] = useState(false)
   const [contactData, setContactData] = useState({ fullName: '', email: '', phone: '', additionalInfo: '' })
   const [modalType, setModalType] = useState<'instant' | 'full'>('full')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const steps = [
     { title: 'Business Details', description: 'Tell us about your business' },
@@ -97,12 +98,6 @@ export default function ValuationPage() {
 
     // Step 2: Calculate Annual Profit
     const annualProfit = annualRevenue * (profitMargin / 100)
-
-    // Debug logging
-    console.log('Debug: monthlyRevenue =', monthlyRevenue)
-    console.log('Debug: annualRevenue =', annualRevenue)
-    console.log('Debug: profitMargin =', profitMargin)
-    console.log('Debug: annualProfit =', annualProfit)
 
     // For very small businesses (under $10k annual revenue), use simple multiples
     if (annualRevenue < 10000) {
@@ -212,29 +207,16 @@ export default function ValuationPage() {
     const revenueValuation = annualRevenue * revenueMultiple
     const profitValuation = annualProfit * profitMultiple
 
-    console.log('Debug: revenueMultiple =', revenueMultiple)
-    console.log('Debug: profitMultiple =', profitMultiple)
-    console.log('Debug: revenueValuation =', revenueValuation)
-    console.log('Debug: profitValuation =', profitValuation)
-
     // Use weighted average (70% profit-based, 30% revenue-based)
     let valuation = (profitValuation * 0.7) + (revenueValuation * 0.3)
-
-    console.log('Debug: valuation before assets =', valuation)
 
     // Add net assets
     const netAssets = data.assets - data.liabilities
     valuation += netAssets
 
-    console.log('Debug: netAssets =', netAssets)
-    console.log('Debug: valuation after assets =', valuation)
-
     // Ensure minimum valuation
     const minValuation = annualRevenue * 0.5
     valuation = Math.max(valuation, minValuation)
-
-    console.log('Debug: minValuation =', minValuation)
-    console.log('Debug: final valuation =', valuation)
 
     // Round to nearest $1,000 only if above $100k
     if (valuation >= 100000) {
@@ -267,18 +249,14 @@ export default function ValuationPage() {
   }
 
   const handleFullReportSubmit = async () => {
-    console.log('handleFullReportSubmit called')
-    console.log('contactData:', contactData)
-
     const trimmedName = contactData.fullName.trim()
     const trimmedEmail = contactData.email.trim()
 
     if (!trimmedName || !trimmedEmail) {
-      alert('Please provide your name and email')
+      setErrorMessage('Please provide your name and email')
       return
     }
 
-    console.log('Validation passed, submitting...')
     setSubmitting(true)
     try {
       const payload = {
@@ -306,27 +284,21 @@ export default function ValuationPage() {
         valuationAmount: calculatedValuation,
       }
 
-      console.log('Payload:', payload)
-
       const response = await fetch('/api/valuation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
 
-      console.log('Response status:', response.status)
       const responseData = await response.json()
-      console.log('Response data:', responseData)
 
       if (response.ok) {
-        console.log('Success, redirecting...')
         router.push('/valuation/thank-you')
       } else {
-        alert(`Error: ${responseData.error || 'Failed to submit'}`)
+        setErrorMessage(responseData.error || 'Failed to submit')
       }
     } catch (error) {
-      console.error('Error submitting valuation:', error)
-      alert('An error occurred. Please try again.')
+      setErrorMessage('An error occurred. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -338,18 +310,14 @@ export default function ValuationPage() {
   }
 
   const handleInstantSellSubmit = async () => {
-    console.log('handleInstantSellSubmit called')
-    console.log('contactData:', contactData)
-
     const trimmedName = contactData.fullName.trim()
     const trimmedEmail = contactData.email.trim()
 
     if (!trimmedName || !trimmedEmail) {
-      alert('Please provide your name and email')
+      setErrorMessage('Please provide your name and email')
       return
     }
 
-    console.log('Validation passed, submitting...')
     setSubmitting(true)
     try {
       // Submit valuation with instant sell flag and contact data
@@ -378,27 +346,21 @@ export default function ValuationPage() {
         valuationAmount: calculatedValuation,
       }
 
-      console.log('Payload:', payload)
-
       const response = await fetch('/api/valuation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
 
-      console.log('Response status:', response.status)
       const responseData = await response.json()
-      console.log('Response data:', responseData)
 
       if (response.ok) {
-        console.log('Success, redirecting...')
         router.push('/valuation/instant-sell-thank-you')
       } else {
-        alert(`Error: ${responseData.error || 'Failed to submit'}`)
+        setErrorMessage(responseData.error || 'Failed to submit')
       }
     } catch (error) {
-      console.error('Error submitting instant sell:', error)
-      alert('An error occurred. Please try again.')
+      setErrorMessage('An error occurred. Please try again.')
     } finally {
       setSubmitting(false)
     }
