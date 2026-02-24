@@ -17,6 +17,9 @@ prisma/*.db-journal
 .next/
 out/
 
+# TypeScript
+*.tsbuildinfo
+
 # Build
 dist/
 build/
