@@ -10,6 +10,8 @@ import { ListingImage } from '@/components/ui/listing-image'
 import { getPlaceholderImage } from '@/lib/placeholder-images'
 import { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Buy & Sell Online Businesses - StartExus Marketplace',
   description: 'Discover profitable online businesses for sale on StartExus. Buy SaaS, ecommerce stores, content sites, and digital assets. Sell your business to qualified buyers worldwide.',
