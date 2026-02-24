@@ -1,8 +1,4 @@
 import nodemailer from 'nodemailer'
-import { config } from 'dotenv'
-
-// Load environment variables
-config()
 
 function escapeHtml(str: string): string {
   return str
@@ -13,19 +9,26 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;')
 }
 
-// Email configuration
-const port = parseInt(process.env.EMAIL_SERVER_PORT || '587')
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST || 'smtp.gmail.com',
-  port: port,
-  secure: port === 465, // true for 465 (SSL), false for other ports (TLS)
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_SERVER_USER,
-    pass: process.env.EMAIL_SERVER_PASSWORD,
-  },
-  tls: { rejectUnauthorized: process.env.NODE_ENV !== 'development' }
-})
+// Email configuration - lazily initialized to avoid issues during build
+let transporter: nodemailer.Transporter | null = null
+
+function getTransporter() {
+  if (!transporter) {
+    const port = parseInt(process.env.EMAIL_SERVER_PORT || '587')
+    transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_SERVER_HOST || 'smtp.gmail.com',
+      port: port,
+      secure: port === 465, // true for 465 (SSL), false for other ports (TLS)
+      requireTLS: true,
+      auth: {
+        user: process.env.EMAIL_SERVER_USER,
+        pass: process.env.EMAIL_SERVER_PASSWORD,
+      },
+      tls: { rejectUnauthorized: process.env.NODE_ENV !== 'development' }
+    })
+  }
+  return transporter
+}
 
 // Email templates
 export const emailTemplates = {
@@ -356,7 +359,7 @@ export async function sendEmail({
   text: string
 }) {
   try {
-    const info = await transporter.sendMail({
+    const info = await getTransporter().sendMail({
       from: process.env.EMAIL_FROM || 'noreply@startexus.com',
       to,
       subject,
