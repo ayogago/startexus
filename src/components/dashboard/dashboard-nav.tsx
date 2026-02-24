@@ -14,7 +14,14 @@ import {
   Shield,
   Plus,
   BookOpen,
-  Mail
+  Mail,
+  Bell,
+  BarChart3,
+  Star,
+  Briefcase,
+  Phone,
+  Search,
+  CheckCircle
 } from 'lucide-react'
 
 interface DashboardNavProps {
@@ -46,6 +53,42 @@ export function DashboardNav({ session }: DashboardNavProps) {
       href: '/dashboard/saved',
       label: 'Saved',
       icon: Heart,
+    },
+    {
+      href: '/dashboard/deals',
+      label: 'Deals',
+      icon: Briefcase,
+    },
+    {
+      href: '/dashboard/calls',
+      label: 'Calls',
+      icon: Phone,
+    },
+    {
+      href: '/dashboard/reviews',
+      label: 'Reviews',
+      icon: Star,
+    },
+    {
+      href: '/dashboard/analytics',
+      label: 'Analytics',
+      icon: BarChart3,
+      show: session.user.role === 'SELLER' || session.user.role === 'ADMIN',
+    },
+    {
+      href: '/dashboard/saved-searches',
+      label: 'Saved Searches',
+      icon: Search,
+    },
+    {
+      href: '/dashboard/notifications',
+      label: 'Notifications',
+      icon: Bell,
+    },
+    {
+      href: '/dashboard/verification',
+      label: 'Verification',
+      icon: CheckCircle,
     },
     {
       href: '/dashboard/profile',

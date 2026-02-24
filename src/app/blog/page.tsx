@@ -10,9 +10,14 @@ import { NewsletterSignup } from '@/components/blog/newsletter-signup'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Blog',
-  description: 'Insights, tips, and stories about buying and selling online businesses, SaaS acquisitions, and digital entrepreneurship.',
-  alternates: { canonical: '/blog' },
+  title: 'Blog - Business Insights & Marketplace Tips',
+  description: 'Expert insights on buying, selling, and growing online businesses. Tips for SaaS, ecommerce, and digital asset transactions on StartExus.',
+  openGraph: {
+    title: 'Blog - Business Insights & Marketplace Tips | StartExus',
+    description: 'Expert insights on buying, selling, and growing online businesses.',
+    url: 'https://startexus.com/blog',
+  },
+  alternates: { canonical: 'https://startexus.com/blog' },
 }
 
 async function getFeaturedPosts() {

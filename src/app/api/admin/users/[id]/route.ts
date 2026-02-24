@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { logAuditEvent } from '@/lib/audit'
 
 interface RouteContext {
   params: {
@@ -42,6 +43,25 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     const user = await prisma.user.update({
       where: { id: userId },
       data: updateData,
+    })
+
+    // Audit logging for admin user actions
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') || undefined
+
+    const actionMap: Record<string, string> = {
+      disable: 'USER_DISABLED',
+      enable: 'USER_ENABLED',
+      verify: 'USER_VERIFIED',
+    }
+
+    await logAuditEvent({
+      userId: session.user.id,
+      action: actionMap[action] || 'USER_UPDATED',
+      targetType: 'USER',
+      targetId: userId,
+      details: `User "${user.name || user.email}" ${action}d by admin`,
+      ipAddress: ip,
     })
 
     return NextResponse.json({ user })
@@ -85,6 +105,19 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
     // Delete the user
     await prisma.user.delete({
       where: { id: userId }
+    })
+
+    // Audit logging for user deletion
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') || undefined
+
+    await logAuditEvent({
+      userId: session.user.id,
+      action: 'USER_DELETED',
+      targetType: 'USER',
+      targetId: userId,
+      details: `User deleted by admin`,
+      ipAddress: ip,
     })
 
     return NextResponse.json({ success: true })

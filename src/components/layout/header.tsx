@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, User, Plus, MessageSquare, Heart, Settings, ChevronDown, DollarSign, Menu, X } from 'lucide-react'
+import { NotificationBell } from '@/components/notifications/notification-bell'
 
 export function Header() {
   const { data: session, status } = useSession()
@@ -128,6 +129,8 @@ export function Header() {
                   <Link href="/dashboard/messages" className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
                     <MessageSquare className="w-5 h-5" />
                   </Link>
+
+                  <NotificationBell />
 
                   <Link href="/dashboard/saved" className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
                     <Heart className="w-5 h-5" />
