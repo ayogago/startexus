@@ -1,0 +1,223 @@
+// SQLite version of the schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  role              Role     @default(BUYER)
+  email             String   @unique
+  emailVerified     DateTime?
+  name              String?
+  handle            String?  @unique
+  bio               String?
+  avatarUrl         String?
+  company           String?
+  location          String?
+  website           String?
+  verified          Boolean  @default(false)
+  disabled          Boolean  @default(false)
+  accounts          Account[]
+  sessions          Session[]
+  listings          Listing[]
+  messages          Message[] @relation("UserMessages")
+  threads           ThreadParticipant[]
+  savedListings     SavedListing[]
+  reports           Report[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  GUEST
+  BUYER
+  SELLER
+  ADMIN
+}
+
+model Listing {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  status            ListingStatus @default(DRAFT)
+  sellerId          String
+  seller            User     @relation(fields: [sellerId], references: [id])
+  title             String
+  slug              String   @unique
+  businessType      BusinessType
+  category          String   // SaaS, Ecommerce, Content, Mobile app, Other
+  askingPrice       Int?     // in USD cents
+  priceType         PriceType @default(ASKING) // ASKING or OPEN_TO_OFFERS
+  revenueTtm        Int?     // cents, trailing 12 months
+  profitTtm         Int?     // cents
+  mrr               Int?     // monthly recurring revenue in cents
+  aov               Int?     // average order value in cents
+  trafficTtm        Int?     // sessions
+  monetization      String   // JSON array as string for SQLite
+  platform          String   // JSON array as string for SQLite
+  techStack         String   // JSON array as string for SQLite
+  establishedAt     DateTime?
+  workloadHrsPerWk  Int?     // owner hours per week
+  teamSize          Int?     // number of employees or contractors
+  description       String
+  highlights        String   // JSON array as string for SQLite
+  growthOps         String   // JSON array as string for SQLite
+  risks             String   // JSON array as string for SQLite
+  assetsIncluded    String   // JSON array as string for SQLite
+  reasonForSale     String?
+  images            ListingImage[]
+  location          String?  // optional
+  confidential      Boolean  @default(false) // hide exact URL and brand if true
+  siteUrl           String?  // optional, masked if confidential
+  analyticsProofUrl String?  // optional link to GA view or screenshots
+  revenueProofUrl   String?  // optional link or upload
+  ndaRequired       Boolean  @default(false)
+  views             Int      @default(0)
+  favorites         Int      @default(0)
+  publishedAt       DateTime?
+  flagged           Boolean  @default(false)
+  savedListings     SavedListing[]
+  threads           Thread[]
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  UNPUBLISHED
+  REJECTED
+}
+
+enum BusinessType {
+  SAAS
+  ECOMMERCE
+  CONTENT
+  MOBILE_APP
+  OTHER
+}
+
+enum PriceType {
+  ASKING
+  OPEN_TO_OFFERS
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  order     Int      @default(0)
+}
+
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+}
+
+model Thread {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  participants ThreadParticipant[]
+  messages   Message[]
+  lastMessageAt DateTime @default(now())
+}
+
+model ThreadParticipant {
+  id       String @id @default(cuid())
+  threadId String
+  userId   String
+  roleInThread ThreadRole // BUYER or SELLER
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId])
+}
+
+enum ThreadRole {
+  BUYER
+  SELLER
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  threadId    String
+  senderId    String
+  body        String
+  readBy      String   // JSON array as string for SQLite
+  sender      User     @relation("UserMessages", fields: [senderId], references: [id])
+  thread      Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  flagged     Boolean  @default(false)
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  reporterId String
+  targetType ReportTarget
+  targetId   String
+  reason     String
+  status     ReportStatus @default(OPEN)
+  reporter   User     @relation(fields: [reporterId], references: [id])
+}
+
+enum ReportTarget {
+  LISTING
+  MESSAGE
+  USER
+}
+
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  CLOSED
+}

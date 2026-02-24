@@ -1,0 +1,273 @@
+// SQLite version of the schema (no enums)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  role              String   @default("BUYER") // GUEST, BUYER, SELLER, ADMIN
+  email             String   @unique
+  emailVerified     DateTime?
+  password          String?
+  name              String?
+  handle            String?  @unique
+  bio               String?
+  avatarUrl         String?
+  company           String?
+  location          String?
+  website           String?
+  verified          Boolean  @default(false)
+  disabled          Boolean  @default(false)
+  failedLoginAttempts Int    @default(0)
+  lockedUntil       DateTime?
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+  accounts          Account[]
+  sessions          Session[]
+  listings          Listing[]
+  messages          Message[] @relation("UserMessages")
+  threads           ThreadParticipant[]
+  savedListings     SavedListing[]
+  reports           Report[]
+  blogPosts         BlogPost[]
+  blogComments      BlogComment[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Listing {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  status            String   @default("DRAFT") // DRAFT, PENDING_REVIEW, PUBLISHED, UNPUBLISHED, REJECTED
+  sellerId          String
+  seller            User     @relation(fields: [sellerId], references: [id])
+  title             String
+  slug              String   @unique
+  businessType      String   // SAAS, ECOMMERCE, AMAZON, CONTENT, MOBILE_APP, OTHER
+  category          String   // SaaS, Ecommerce, Amazon, Content, Mobile app, Other
+  isAiRelated       Boolean  @default(false) // true if business uses AI technology
+  aiTechnologies    String   @default("[]") // JSON array of AI technologies used
+  askingPrice       Int?     // in USD cents
+  priceType         String   @default("ASKING") // ASKING, OPEN_TO_OFFERS
+  revenueTtm        Int?     // cents, trailing 12 months
+  profitTtm         Int?     // cents
+  mrr               Int?     // monthly recurring revenue in cents
+  aov               Int?     // average order value in cents
+  trafficTtm        Int?     // sessions
+  monetization      String   @default("[]") // JSON array as string for SQLite
+  platform          String   @default("[]") // JSON array as string for SQLite
+  techStack         String   @default("[]") // JSON array as string for SQLite
+  establishedAt     DateTime?
+  workloadHrsPerWk  Int?     // owner hours per week
+  teamSize          Int?     // number of employees or contractors
+  description       String
+  highlights        String   @default("[]") // JSON array as string for SQLite
+  growthOps         String   @default("[]") // JSON array as string for SQLite
+  risks             String   @default("[]") // JSON array as string for SQLite
+  assetsIncluded    String   @default("[]") // JSON array as string for SQLite
+  reasonForSale     String?
+  images            ListingImage[]
+  location          String?  // optional
+  confidential      Boolean  @default(false) // hide exact URL and brand if true
+  siteUrl           String?  // optional, masked if confidential
+  analyticsProofUrl String?  // optional link to GA view or screenshots
+  revenueProofUrl   String?  // optional link or upload
+  ndaRequired       Boolean  @default(false)
+  views             Int      @default(0)
+  favorites         Int      @default(0)
+  publishedAt       DateTime?
+  flagged           Boolean  @default(false)
+  featured          Boolean  @default(false)
+  featuredAt        DateTime?
+  rejectionReason   String?  // admin feedback when rejecting a listing
+  savedListings     SavedListing[]
+  threads           Thread[]
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  order     Int      @default(0)
+}
+
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+}
+
+model Thread {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  participants ThreadParticipant[]
+  messages   Message[]
+  lastMessageAt DateTime @default(now())
+}
+
+model ThreadParticipant {
+  id       String @id @default(cuid())
+  threadId String
+  userId   String
+  roleInThread String // BUYER, SELLER
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  threadId    String
+  senderId    String
+  body        String
+  readBy      String   @default("[]") // JSON array as string for SQLite
+  sender      User     @relation("UserMessages", fields: [senderId], references: [id])
+  thread      Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  flagged     Boolean  @default(false)
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  reporterId String
+  targetType String   // LISTING, MESSAGE, USER
+  targetId   String
+  reason     String
+  status     String   @default("OPEN") // OPEN, UNDER_REVIEW, CLOSED
+  reporter   User     @relation(fields: [reporterId], references: [id])
+}
+
+model ValuationRequest {
+  id                   String   @id @default(cuid())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  businessName        String
+  businessType        String
+  websiteUrl          String
+  monthlyRevenue      String
+  yearlyRevenue       String?
+  profitMargin        String?
+  monthsEstablished   String
+  primaryTrafficSource String?
+  isAiRelated         Boolean?
+  sellTimeframe       String?
+  contactName         String
+  contactEmail        String
+  contactPhone        String?
+  additionalInfo      String?
+  status              String   @default("PENDING") // PENDING, IN_REVIEW, COMPLETED, CANCELLED
+  requestedAt         DateTime @default(now())
+  completedAt         DateTime?
+  assignedTo          String?
+  notes               String?
+}
+
+model BlogPost {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  title            String
+  slug             String   @unique
+  excerpt          String?  // Short description for previews
+  content          String   // Rich text content (HTML)
+  featuredImage    String?  // URL to featured image
+  tags             String   @default("[]") // JSON array as string for SQLite
+  categories       String   @default("[]") // JSON array as string for SQLite
+  status           String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  publishedAt      DateTime?
+  metaTitle        String?  // SEO meta title
+  metaDescription  String?  // SEO meta description
+  authorId         String
+  author           User     @relation(fields: [authorId], references: [id])
+  views            Int      @default(0)
+  featured         Boolean  @default(false)
+  comments         BlogComment[]
+}
+
+model BlogComment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
+  authorId  String?  // Optional for anonymous comments
+  author    User?    @relation(fields: [authorId], references: [id])
+  postId    String
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId  String?  // For nested comments
+  parent    BlogComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   BlogComment[] @relation("CommentReplies")
+  status    String   @default("APPROVED") // PENDING, APPROVED, REJECTED
+}
+
+model NewsletterSubscriber {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  subscribedAt  DateTime @default(now())
+  status        String   @default("ACTIVE") // ACTIVE, UNSUBSCRIBED
+  unsubscribeToken String @unique @default(cuid())
+  emailsSent    NewsletterEmail[]
+}
+
+model NewsletterEmail {
+  id            String   @id @default(cuid())
+  subscriberId  String
+  subscriber    NewsletterSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  blogPostId    String?
+  subject       String
+  sentAt        DateTime @default(now())
+  openedAt      DateTime?
+  clickedAt     DateTime?
+  clickedLinks  String   @default("[]") // JSON array of clicked links
+}

@@ -1,0 +1,75 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="url(#gradient4)"/>
+  <defs>
+    <linearGradient id="gradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Phone mockups -->
+  <g transform="translate(200, 100)">
+    <!-- Phone 1 -->
+    <rect x="0" y="0" width="120" height="220" rx="20" fill="white" opacity="0.9"/>
+    <rect x="10" y="25" width="100" height="170" rx="8" fill="#1f2937"/>
+    <rect x="20" y="35" width="80" height="8" rx="4" fill="#4ade80"/>
+    <rect x="20" y="50" width="80" height="25" rx="4" fill="#3b82f6"/>
+    <rect x="20" y="85" width="35" height="35" rx="8" fill="#f59e0b"/>
+    <rect x="65" y="85" width="35" height="35" rx="8" fill="#ef4444"/>
+    <rect x="20" y="130" width="35" height="35" rx="8" fill="#10b981"/>
+    <rect x="65" y="130" width="35" height="35" rx="8" fill="#8b5cf6"/>
+    <circle cx="60" cy="210" r="8" fill="#e5e7eb"/>
+  </g>
+
+  <g transform="translate(350, 100)">
+    <!-- Phone 2 -->
+    <rect x="0" y="0" width="120" height="220" rx="20" fill="white" opacity="0.9"/>
+    <rect x="10" y="25" width="100" height="170" rx="8" fill="#f8fafc"/>
+    <rect x="20" y="35" width="80" height="12" rx="4" fill="#e2e8f0"/>
+    <rect x="20" y="55" width="60" height="12" rx="4" fill="#e2e8f0"/>
+    <rect x="20" y="80" width="80" height="30" rx="4" fill="#ddd6fe"/>
+    <rect x="20" y="120" width="80" height="20" rx="4" fill="#fecaca"/>
+    <rect x="20" y="150" width="80" height="20" rx="4" fill="#bbf7d0"/>
+    <circle cx="60" cy="210" r="8" fill="#6366f1"/>
+  </g>
+
+  <g transform="translate(500, 100)">
+    <!-- Phone 3 -->
+    <rect x="0" y="0" width="120" height="220" rx="20" fill="white" opacity="0.9"/>
+    <rect x="10" y="25" width="100" height="170" rx="8" fill="#0f172a"/>
+    <rect x="20" y="40" width="20" height="20" rx="4" fill="#22d3ee"/>
+    <rect x="45" y="40" width="20" height="20" rx="4" fill="#a78bfa"/>
+    <rect x="70" y="40" width="20" height="20" rx="4" fill="#fb7185"/>
+    <rect x="20" y="70" width="80" height="40" rx="4" fill="#1e293b"/>
+    <rect x="30" y="80" width="60" height="8" rx="4" fill="#64748b"/>
+    <rect x="30" y="92" width="40" height="8" rx="4" fill="#64748b"/>
+    <rect x="20" y="125" width="80" height="60" rx="4" fill="#334155"/>
+    <circle cx="60" cy="210" r="8" fill="#f1f5f9"/>
+  </g>
+
+  <!-- App store icons -->
+  <g transform="translate(250, 380)">
+    <rect x="0" y="0" width="120" height="40" rx="8" fill="white" opacity="0.9"/>
+    <rect x="10" y="8" width="24" height="24" rx="4" fill="#1f2937"/>
+    <text x="45" y="18" fill="#1f2937" font-family="Arial, sans-serif" font-size="10" font-weight="bold">App Store</text>
+    <text x="45" y="28" fill="#6b7280" font-family="Arial, sans-serif" font-size="8">Download</text>
+  </g>
+
+  <g transform="translate(400, 380)">
+    <rect x="0" y="0" width="120" height="40" rx="8" fill="white" opacity="0.9"/>
+    <rect x="10" y="8" width="24" height="24" rx="4" fill="#22c55e"/>
+    <text x="45" y="18" fill="#1f2937" font-family="Arial, sans-serif" font-size="10" font-weight="bold">Google Play</text>
+    <text x="45" y="28" fill="#6b7280" font-family="Arial, sans-serif" font-size="8">Download</text>
+  </g>
+
+  <!-- Mobile icon -->
+  <g transform="translate(350, 50)">
+    <circle cx="50" cy="30" r="25" fill="white" opacity="0.3"/>
+    <rect x="40" y="15" width="20" height="30" rx="4" fill="white" opacity="0.6"/>
+    <circle cx="50" cy="52" r="3" fill="white" opacity="0.6"/>
+  </g>
+
+  <!-- Text -->
+  <text x="400" y="480" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="32" font-weight="bold">Mobile App</text>
+  <text x="400" y="510" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" opacity="0.8">iOS & Android Application</text>
+</svg>

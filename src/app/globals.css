@@ -1,0 +1,538 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Mobile optimizations */
+@layer base {
+  /* Better font rendering on mobile */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better tap highlighting */
+  * {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+  }
+
+  /* Ensure responsive behavior */
+  html {
+    box-sizing: border-box;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+
+  /* Mobile-specific resets */
+  @media screen and (max-width: 768px) {
+    /* Force proper mobile rendering */
+    html, body {
+      width: 100% !important;
+      overflow-x: hidden !important;
+    }
+
+    /* Reset any problematic styles */
+    .container {
+      max-width: 100% !important;
+      margin: 0 auto !important;
+    }
+
+    /* Ensure grid works on mobile */
+    [class*="grid-cols"] {
+      display: grid !important;
+    }
+
+    .grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Force text sizing */
+    .text-sm {
+      font-size: 0.875rem !important;
+    }
+
+    .text-xs {
+      font-size: 0.75rem !important;
+    }
+  }
+}
+
+/* Custom responsive utilities */
+@layer utilities {
+  /* Force mobile-first approach for all mobile devices */
+  @media screen and (max-width: 768px) {
+    .mobile-grid-2 {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 0.75rem !important;
+    }
+
+    .mobile-text-sm {
+      font-size: 0.875rem !important;
+      line-height: 1.25rem !important;
+    }
+
+    .mobile-text-xs {
+      font-size: 0.75rem !important;
+      line-height: 1rem !important;
+    }
+
+    .mobile-p-3 {
+      padding: 0.75rem !important;
+    }
+
+    .mobile-rounded {
+      border-radius: 0.5rem !important;
+    }
+  }
+}
+
+/* Enhanced Blog Content Styles */
+@layer components {
+  /* Blog content enhanced styling */
+  .blog-content-enhanced {
+    font-family: inherit !important;
+    line-height: 1.7;
+    color: #333;
+  }
+
+  .blog-content-enhanced * {
+    margin: revert;
+    padding: revert;
+  }
+
+  .blog-content-enhanced .intro-section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .blog-content-enhanced .section-title {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 1.5rem !important;
+    color: inherit !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .blog-content-enhanced .intro-section .section-title {
+    color: white !important;
+  }
+
+  .blog-content-enhanced .lead-paragraph {
+    font-size: 1.2rem !important;
+    margin-bottom: 1.5rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .blog-content-enhanced .highlight-box {
+    background: rgba(255, 255, 255, 0.1) !important;
+    padding: 1.5rem !important;
+    border-radius: 8px !important;
+    border-left: 4px solid #ffd700 !important;
+    margin-top: 1.5rem !important;
+  }
+
+  .blog-content-enhanced .tools-section {
+    margin-bottom: 3rem !important;
+  }
+
+  .blog-content-enhanced .tool-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 2rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .blog-content-enhanced .tool-card {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 2rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .blog-content-enhanced .tool-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .blog-content-enhanced .tool-card.featured {
+    border: 2px solid #3b82f6 !important;
+    background: linear-gradient(135deg, #f8faff 0%, #f1f5ff 100%) !important;
+  }
+
+  .blog-content-enhanced .tool-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    margin-bottom: 1rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .blog-content-enhanced .tool-title {
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    margin: 0 !important;
+    flex: 1;
+  }
+
+  .blog-content-enhanced .badge {
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 9999px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .blog-content-enhanced .badge.recommended {
+    background: #10b981 !important;
+    color: white !important;
+  }
+
+  .blog-content-enhanced .badge.pro {
+    background: #8b5cf6 !important;
+    color: white !important;
+  }
+
+  .blog-content-enhanced .badge.designer {
+    background: #f59e0b !important;
+    color: white !important;
+  }
+
+  .blog-content-enhanced .tool-description {
+    color: #6b7280 !important;
+    margin-bottom: 1.5rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .blog-content-enhanced .tool-features {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .blog-content-enhanced .feature-tag {
+    background: #e5e7eb !important;
+    color: #374151 !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 9999px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+  }
+
+  .blog-content-enhanced .tool-card.featured .feature-tag {
+    background: #dbeafe !important;
+    color: #1e40af !important;
+  }
+
+  .blog-content-enhanced .cta-box {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+    padding: 1.5rem !important;
+    border-radius: 8px !important;
+    border-left: 4px solid #f59e0b !important;
+    margin-top: 2rem !important;
+  }
+
+  .blog-content-enhanced .guide-section {
+    margin-bottom: 3rem !important;
+  }
+
+  .blog-content-enhanced .steps-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+    margin-top: 2rem !important;
+  }
+
+  .blog-content-enhanced .step-item {
+    display: flex !important;
+    gap: 1.5rem !important;
+    align-items: flex-start !important;
+  }
+
+  .blog-content-enhanced .step-number {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: white !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 700 !important;
+    font-size: 1.2rem !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .blog-content-enhanced .step-content {
+    flex: 1 !important;
+  }
+
+  .blog-content-enhanced .step-title {
+    font-size: 1.4rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.75rem !important;
+    color: #1f2937 !important;
+  }
+
+  .blog-content-enhanced .step-checklist {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 1rem 0 !important;
+  }
+
+  .blog-content-enhanced .step-checklist li {
+    padding: 0.5rem 0 !important;
+    position: relative !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .blog-content-enhanced .step-checklist li:before {
+    content: "✓" !important;
+    position: absolute !important;
+    left: 0 !important;
+    color: #10b981 !important;
+    font-weight: bold !important;
+  }
+
+  .blog-content-enhanced .tip-box {
+    background: #f0f9ff !important;
+    border: 1px solid #0ea5e9 !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .blog-content-enhanced .success-metrics {
+    background: #f0fdf4 !important;
+    border: 1px solid #22c55e !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .blog-content-enhanced .success-metrics ul {
+    margin: 0.5rem 0 0 0 !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .blog-content-enhanced .monetization-section {
+    background: linear-gradient(135deg, #f8faff 0%, #f1f5ff 100%) !important;
+    padding: 3rem 2rem !important;
+    border-radius: 12px !important;
+    margin-bottom: 3rem !important;
+  }
+
+  .blog-content-enhanced .monetization-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    gap: 1.5rem !important;
+    margin-top: 2rem !important;
+  }
+
+  .blog-content-enhanced .monetization-card {
+    background: white !important;
+    padding: 1.5rem !important;
+    border-radius: 8px !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .blog-content-enhanced .monetization-card h4 {
+    margin: 0 0 1rem 0 !important;
+    color: #1f2937 !important;
+    font-size: 1.1rem !important;
+  }
+
+  .blog-content-enhanced .conclusion-section {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+    padding: 3rem 2rem !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+  }
+
+  .blog-content-enhanced .conclusion-text {
+    font-size: 1.2rem !important;
+    margin-bottom: 2rem !important;
+    color: #374151 !important;
+  }
+
+  .blog-content-enhanced .next-steps-box {
+    background: white !important;
+    padding: 2rem !important;
+    border-radius: 8px !important;
+    border: 1px solid #d1d5db !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    text-align: left !important;
+  }
+
+  .blog-content-enhanced .next-steps-box h4 {
+    margin: 0 0 1rem 0 !important;
+    color: #1f2937 !important;
+    text-align: center !important;
+  }
+
+  .blog-content-enhanced .next-steps-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .blog-content-enhanced .next-steps-list li {
+    padding: 0.75rem 0 !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+  }
+
+  .blog-content-enhanced .next-steps-list li:last-child {
+    border-bottom: none !important;
+  }
+
+  .blog-content-enhanced .internal-link {
+    color: #3b82f6 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    border-bottom: 1px dotted #3b82f6 !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .blog-content-enhanced .internal-link:hover {
+    color: #1d4ed8 !important;
+    border-bottom-style: solid !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+    padding: 0.125rem 0.25rem !important;
+    border-radius: 4px !important;
+  }
+
+  /* Mobile responsive blog styles */
+  @media (max-width: 768px) {
+    .blog-content-enhanced .intro-section,
+    .blog-content-enhanced .monetization-section,
+    .blog-content-enhanced .conclusion-section {
+      padding: 1.5rem 1rem !important;
+    }
+
+    .blog-content-enhanced .section-title {
+      font-size: 1.5rem !important;
+    }
+
+    .blog-content-enhanced .tool-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+    }
+
+    .blog-content-enhanced .tool-card {
+      padding: 1.5rem !important;
+    }
+
+    .blog-content-enhanced .step-item {
+      flex-direction: column !important;
+      gap: 1rem !important;
+    }
+
+    .blog-content-enhanced .step-number {
+      align-self: flex-start !important;
+    }
+
+    .blog-content-enhanced .monetization-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+    /* Force mobile header to stack properly */
+    .mobile-header {
+      flex-direction: column !important;
+    }
+
+    /* Ensure mobile styles override everything */
+    body {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Additional mobile-only styles for very small screens */
+  @media screen and (max-width: 480px) {
+    .container {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+
+    /* Force smaller text on very small screens */
+    .mobile-text-xs {
+      font-size: 0.6875rem !important;
+    }
+  }

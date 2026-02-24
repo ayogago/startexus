@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Important pages
+Allow: /browse
+Allow: /sell
+Allow: /listings/
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /how-it-works
+Allow: /seller-guide
+Allow: /blog/
+
+# Disallow private/admin areas
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /admin/
+
+# Disallow non-essential pages
+Disallow: /valuation/thank-you
+
+# XML Sitemap
+Sitemap: https://startexus.com/sitemap.xml
+
+# Crawl-delay for better server performance
+Crawl-delay: 1

@@ -1,0 +1,64 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="rocketGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e0e7ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="flameOrange" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f97316;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="flameYellow" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef3c7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="url(#mainGradient)"/>
+
+  <!-- Stars -->
+  <circle cx="6" cy="8" r="0.8" fill="white" opacity="0.6"/>
+  <circle cx="26" cy="10" r="0.6" fill="white" opacity="0.5"/>
+  <circle cx="8" cy="20" r="0.5" fill="white" opacity="0.4"/>
+
+  <!-- Rocket body main -->
+  <ellipse cx="16" cy="14" rx="3.5" ry="7" fill="url(#rocketGradient)"/>
+
+  <!-- Rocket nose cone -->
+  <path d="M16 5 C14 5, 12.5 7, 12.5 9 C12.5 9, 12.5 10, 16 10 C19.5 10, 19.5 9, 19.5 9 C19.5 7, 18 5, 16 5 Z" fill="#60a5fa"/>
+
+  <!-- Rocket window -->
+  <circle cx="16" cy="12" r="1.3" fill="#1e40af" opacity="0.3"/>
+  <circle cx="16" cy="12" r="1" fill="#3b82f6"/>
+
+  <!-- Left fin -->
+  <path d="M12.5 16 L10 20 L10 22 C10 22, 10.5 21.5, 11.5 20 L12.5 18 Z" fill="#60a5fa"/>
+  <path d="M12.5 16 L10.5 20 L11.5 20 L12.5 17.5 Z" fill="#3b82f6" opacity="0.6"/>
+
+  <!-- Right fin -->
+  <path d="M19.5 16 L22 20 L22 22 C22 22, 21.5 21.5, 20.5 20 L19.5 18 Z" fill="#60a5fa"/>
+  <path d="M19.5 16 L21.5 20 L20.5 20 L19.5 17.5 Z" fill="#3b82f6" opacity="0.6"/>
+
+  <!-- Bottom of rocket -->
+  <ellipse cx="16" cy="20" rx="3.5" ry="1.2" fill="#93c5fd" opacity="0.8"/>
+
+  <!-- Flame - orange outer -->
+  <ellipse cx="14" cy="22" rx="1.2" ry="3" fill="url(#flameOrange)" opacity="0.9"/>
+  <ellipse cx="16" cy="23" rx="1.5" ry="4" fill="url(#flameOrange)"/>
+  <ellipse cx="18" cy="22" rx="1.2" ry="3" fill="url(#flameOrange)" opacity="0.9"/>
+
+  <!-- Flame - yellow inner -->
+  <ellipse cx="14" cy="22" rx="0.7" ry="2" fill="url(#flameYellow)"/>
+  <ellipse cx="16" cy="23" rx="0.9" ry="2.8" fill="url(#flameYellow)"/>
+  <ellipse cx="18" cy="22" rx="0.7" ry="2" fill="url(#flameYellow)"/>
+
+  <!-- Detail lines on rocket body -->
+  <rect x="15.5" y="14" width="1" height="4" fill="#93c5fd" opacity="0.4" rx="0.5"/>
+</svg>

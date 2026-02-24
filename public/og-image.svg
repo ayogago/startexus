@@ -1,0 +1,105 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="rocketBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e0e7ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="flameOrange" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f97316;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="flameYellow" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef3c7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Decorative stars scattered -->
+  <circle cx="100" cy="100" r="4" fill="white" opacity="0.6"/>
+  <circle cx="180" cy="80" r="3" fill="white" opacity="0.5"/>
+  <circle cx="250" cy="130" r="2.5" fill="white" opacity="0.4"/>
+  <circle cx="1100" cy="530" r="5" fill="white" opacity="0.5"/>
+  <circle cx="1050" cy="100" r="4" fill="white" opacity="0.4"/>
+  <circle cx="900" cy="80" r="3" fill="white" opacity="0.6"/>
+  <circle cx="150" cy="500" r="3" fill="white" opacity="0.4"/>
+  <circle cx="950" cy="550" r="2.5" fill="white" opacity="0.3"/>
+  <circle cx="1120" cy="200" r="3" fill="white" opacity="0.5"/>
+
+  <!-- Logo container with shadow effect -->
+  <ellipse cx="200" cy="315" rx="110" ry="110" fill="black" opacity="0.1"/>
+  <rect x="100" y="215" width="200" height="200" rx="50" fill="white" opacity="0.98"/>
+
+  <!-- Rocket body main cylinder -->
+  <ellipse cx="200" cy="285" rx="22" ry="45" fill="url(#rocketBody)"/>
+
+  <!-- Rocket nose cone -->
+  <path d="M200 230 C190 230, 178 242, 178 255 C178 255, 178 260, 200 260 C222 260, 222 255, 222 255 C222 242, 210 230, 200 230 Z" fill="#60a5fa"/>
+
+  <!-- Rocket windows -->
+  <circle cx="200" cy="270" r="8" fill="#1e40af" opacity="0.3"/>
+  <circle cx="200" cy="270" r="6" fill="#3b82f6"/>
+  <circle cx="198" cy="268" r="2" fill="#93c5fd" opacity="0.8"/>
+
+  <circle cx="200" cy="295" r="5" fill="#1e40af" opacity="0.2"/>
+  <circle cx="200" cy="295" r="4" fill="#3b82f6" opacity="0.7"/>
+
+  <!-- Left fin -->
+  <path d="M178 300 L158 330 L158 345 C158 345, 162 340, 170 330 L178 315 Z" fill="#60a5fa"/>
+  <path d="M178 300 L160 330 L168 330 L178 310 Z" fill="#3b82f6" opacity="0.7"/>
+
+  <!-- Right fin -->
+  <path d="M222 300 L242 330 L242 345 C242 345, 238 340, 230 330 L222 315 Z" fill="#60a5fa"/>
+  <path d="M222 300 L240 330 L232 330 L222 310 Z" fill="#3b82f6" opacity="0.7"/>
+
+  <!-- Bottom section of rocket -->
+  <ellipse cx="200" cy="325" rx="22" ry="8" fill="#93c5fd" opacity="0.9"/>
+
+  <!-- Flame effect - outer orange -->
+  <ellipse cx="185" cy="335" rx="7" ry="20" fill="url(#flameOrange)" opacity="0.95"/>
+  <ellipse cx="200" cy="340" rx="9" ry="28" fill="url(#flameOrange)"/>
+  <ellipse cx="215" cy="335" rx="7" ry="20" fill="url(#flameOrange)" opacity="0.95"/>
+
+  <!-- Flame effect - inner yellow -->
+  <ellipse cx="185" cy="335" rx="4" ry="14" fill="url(#flameYellow)"/>
+  <ellipse cx="200" cy="340" rx="5" ry="20" fill="url(#flameYellow)"/>
+  <ellipse cx="215" cy="335" rx="4" ry="14" fill="url(#flameYellow)"/>
+
+  <!-- Hot core -->
+  <ellipse cx="200" cy="338" rx="3" ry="12" fill="white" opacity="0.9"/>
+
+  <!-- Detail stripes -->
+  <rect x="197" y="285" width="6" height="30" fill="#93c5fd" opacity="0.4" rx="3"/>
+  <path d="M185 275 L215 275 L215 278 L185 278 Z" fill="#ef4444" opacity="0.6"/>
+  <path d="M185 280 L215 280 L215 283 L185 283 Z" fill="#ef4444" opacity="0.6"/>
+
+  <!-- Main text with shadow -->
+  <text x="348" y="300" font-family="Arial, sans-serif" font-size="78" font-weight="bold" fill="black" opacity="0.1">
+    StartExus
+  </text>
+  <text x="350" y="298" font-family="Arial, sans-serif" font-size="78" font-weight="bold" fill="white">
+    StartExus
+  </text>
+
+  <!-- Subtitle -->
+  <text x="350" y="358" font-family="Arial, sans-serif" font-size="36" fill="white" opacity="0.95">
+    Buy &amp; Sell Online Businesses
+  </text>
+
+  <!-- Tagline with rocket emoji -->
+  <text x="350" y="440" font-family="Arial, sans-serif" font-size="28" fill="white" opacity="0.85">
+    🚀 Launch Your Business Journey Today
+  </text>
+
+  <!-- Additional accent line -->
+  <rect x="350" y="370" width="150" height="3" fill="white" opacity="0.4" rx="1.5"/>
+</svg>
