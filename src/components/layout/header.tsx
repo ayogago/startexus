@@ -31,8 +31,8 @@ export function Header() {
             <Image
               src="/startexus-light.png"
               alt="StartExus Logo"
-              width={180}
-              height={48}
+              width={240}
+              height={64}
               priority
             />
           </Link>

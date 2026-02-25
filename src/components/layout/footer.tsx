@@ -8,7 +8,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center mb-4">
-              <Image src="/startexus-light.png" alt="StartExus" width={180} height={48} />
+              <Image src="/startexus-light.png" alt="StartExus" width={240} height={64} />
             </div>
             <p className="text-gray-600 text-sm">
               The premier marketplace for buying and selling online businesses.

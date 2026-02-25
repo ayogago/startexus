@@ -115,7 +115,7 @@ function SignUpContent() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Link href="/" className="flex items-center justify-center mb-6">
-            <Image src="/startexus-light.png" alt="StartExus Logo" width={180} height={48} priority />
+            <Image src="/startexus-light.png" alt="StartExus Logo" width={240} height={64} priority />
           </Link>
           <CardTitle>Create your account</CardTitle>
           <CardDescription>
