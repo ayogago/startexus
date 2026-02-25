@@ -58,11 +58,10 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
 
         <BlogPostEditor
           initialData={{
-            ...post,
-            excerpt: post.excerpt || undefined,
+            title: post.title,
+            slug: post.slug,
+            content: post.content,
             featuredImage: post.featuredImage || undefined,
-            metaTitle: post.metaTitle || undefined,
-            metaDescription: post.metaDescription || undefined,
             status: post.status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED',
           }}
           postId={params.id}

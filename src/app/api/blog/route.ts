@@ -7,16 +7,130 @@ import { z } from 'zod'
 const createBlogPostSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   slug: z.string().min(1, 'Slug is required'),
-  excerpt: z.string().optional(),
   content: z.string().min(1, 'Content is required'),
   featuredImage: z.string().optional(),
-  tags: z.array(z.string()).default([]),
-  categories: z.array(z.string()).default([]),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).default('DRAFT'),
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
-  featured: z.boolean().default(false),
 })
+
+const PREDEFINED_CATEGORIES = [
+  'Business Acquisition',
+  'Due Diligence',
+  'Valuation',
+  'SaaS',
+  'E-commerce',
+  'AI & Technology',
+  'Investment Tips',
+  'Case Studies',
+  'Market Analysis',
+  'Success Stories',
+]
+
+const PREDEFINED_TAGS = [
+  'online business',
+  'acquisition',
+  'investment',
+  'due diligence',
+  'valuation',
+  'saas',
+  'ecommerce',
+  'ai',
+  'passive income',
+  'entrepreneurship',
+  'digital assets',
+  'roi',
+  'growth',
+  'startup',
+  'exit strategy',
+]
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function generateExcerpt(content: string): string {
+  const plainText = stripHtml(content)
+  if (plainText.length <= 160) return plainText
+  return plainText.slice(0, 157).replace(/\s+\S*$/, '') + '...'
+}
+
+function generateMetaDescription(title: string, content: string): string {
+  const plainText = stripHtml(content)
+  const desc = plainText.slice(0, 155).replace(/\s+\S*$/, '')
+  return desc.length < plainText.length ? desc + '...' : desc
+}
+
+function generateCategories(title: string, content: string): string[] {
+  const text = (title + ' ' + stripHtml(content)).toLowerCase()
+  const matched: string[] = []
+
+  const categoryKeywords: Record<string, string[]> = {
+    'Business Acquisition': ['acquisition', 'acquire', 'buying a business', 'purchase', 'buy a business', 'deal'],
+    'Due Diligence': ['due diligence', 'audit', 'investigation', 'verify', 'assessment', 'risk analysis'],
+    'Valuation': ['valuation', 'value', 'worth', 'pricing', 'appraisal', 'multiple', 'revenue multiple'],
+    'SaaS': ['saas', 'software as a service', 'subscription', 'mrr', 'arr', 'recurring revenue', 'churn'],
+    'E-commerce': ['ecommerce', 'e-commerce', 'online store', 'shopify', 'amazon', 'dropshipping', 'retail'],
+    'AI & Technology': ['ai', 'artificial intelligence', 'machine learning', 'technology', 'automation', 'tech', 'gpt', 'llm'],
+    'Investment Tips': ['invest', 'investment', 'tips', 'strategy', 'portfolio', 'returns', 'roi', 'profit'],
+    'Case Studies': ['case study', 'case studies', 'example', 'real-world', 'success story', 'how we', 'lessons learned'],
+    'Market Analysis': ['market', 'analysis', 'trend', 'industry', 'forecast', 'report', 'data', 'statistics'],
+    'Success Stories': ['success', 'story', 'journey', 'achieved', 'grew', 'scaled', 'milestone', 'transformation'],
+  }
+
+  for (const [category, keywords] of Object.entries(categoryKeywords)) {
+    if (keywords.some(kw => text.includes(kw))) {
+      matched.push(category)
+    }
+  }
+
+  if (matched.length === 0) {
+    matched.push('Investment Tips')
+  }
+
+  return matched.slice(0, 3)
+}
+
+function generateTags(title: string, content: string): string[] {
+  const text = (title + ' ' + stripHtml(content)).toLowerCase()
+  const matched: string[] = []
+
+  for (const tag of PREDEFINED_TAGS) {
+    if (text.includes(tag)) {
+      matched.push(tag)
+    }
+  }
+
+  // Also check partial matches for common terms
+  const extraMappings: Record<string, string> = {
+    'saas': 'saas',
+    'e-commerce': 'ecommerce',
+    'ecommerce': 'ecommerce',
+    'artificial intelligence': 'ai',
+    'machine learning': 'ai',
+    'invest': 'investment',
+    'acquire': 'acquisition',
+    'startup': 'startup',
+    'entrepreneur': 'entrepreneurship',
+    'passive income': 'passive income',
+    'digital': 'digital assets',
+    'growth': 'growth',
+    'roi': 'roi',
+    'exit': 'exit strategy',
+    'due diligence': 'due diligence',
+    'valuation': 'valuation',
+  }
+
+  for (const [keyword, tag] of Object.entries(extraMappings)) {
+    if (text.includes(keyword) && !matched.includes(tag)) {
+      matched.push(tag)
+    }
+  }
+
+  if (matched.length === 0) {
+    matched.push('online business')
+  }
+
+  return [...new Set(matched)].slice(0, 6)
+}
 
 // Generate slug from title
 function generateSlug(title: string): string {
@@ -189,13 +303,28 @@ export async function POST(request: NextRequest) {
       validatedData.slug = uniqueSlug
     }
 
+    // Auto-generate metadata from content
+    const excerpt = generateExcerpt(validatedData.content)
+    const metaTitle = validatedData.title
+    const metaDescription = generateMetaDescription(validatedData.title, validatedData.content)
+    const categories = generateCategories(validatedData.title, validatedData.content)
+    const tags = generateTags(validatedData.title, validatedData.content)
+
     const publishedAt = validatedData.status === 'PUBLISHED' ? new Date() : null
 
     const post = await prisma.blogPost.create({
       data: {
-        ...validatedData,
-        tags: JSON.stringify(validatedData.tags || []),
-        categories: JSON.stringify(validatedData.categories || []),
+        title: validatedData.title,
+        slug: validatedData.slug,
+        content: validatedData.content,
+        featuredImage: validatedData.featuredImage,
+        status: validatedData.status,
+        excerpt,
+        metaTitle,
+        metaDescription,
+        tags: JSON.stringify(tags),
+        categories: JSON.stringify(categories),
+        featured: false,
         authorId: session.user.id,
         publishedAt,
       },

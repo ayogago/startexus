@@ -1,28 +1,16 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import {
   Save,
   Eye,
   Upload,
   X,
-  Plus,
   Image as ImageIcon,
   Bold,
   Italic,
@@ -33,75 +21,42 @@ import {
   Quote,
   Heading1,
   Heading2,
-  Heading3
+  Heading3,
+  ArrowLeft,
+  FileText,
+  Loader2,
+  Sparkles
 } from 'lucide-react'
 
 interface BlogPostData {
   title: string
   slug: string
-  excerpt: string
   content: string
   featuredImage: string
-  tags: string[]
-  categories: string[]
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
-  metaTitle: string
-  metaDescription: string
-  featured: boolean
 }
 
-const PREDEFINED_CATEGORIES = [
-  'Business Acquisition',
-  'Due Diligence',
-  'Valuation',
-  'SaaS',
-  'E-commerce',
-  'AI & Technology',
-  'Investment Tips',
-  'Case Studies',
-  'Market Analysis',
-  'Success Stories'
-]
-
-const PREDEFINED_TAGS = [
-  'online business',
-  'acquisition',
-  'investment',
-  'due diligence',
-  'valuation',
-  'saas',
-  'ecommerce',
-  'ai',
-  'passive income',
-  'entrepreneurship',
-  'digital assets',
-  'roi',
-  'growth',
-  'startup',
-  'exit strategy'
-]
-
-export function BlogPostEditor({ initialData, postId }: { initialData?: Partial<BlogPostData>; postId?: string }) {
+export function BlogPostEditor({ initialData, postId }: { initialData?: Partial<BlogPostData & { excerpt?: string; tags?: string[]; categories?: string[]; metaTitle?: string; metaDescription?: string; featured?: boolean }>; postId?: string }) {
   const router = useRouter()
   const contentRef = useRef<HTMLTextAreaElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [newTag, setNewTag] = useState('')
-  const [newCategory, setNewCategory] = useState('')
   const [showNewsletterDialog, setShowNewsletterDialog] = useState(false)
   const [pendingPublishData, setPendingPublishData] = useState<any>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [activeToolbar, setActiveToolbar] = useState<string | null>(null)
 
   const [formData, setFormData] = useState<BlogPostData>({
     title: initialData?.title || '',
     slug: initialData?.slug || '',
-    excerpt: initialData?.excerpt || '',
     content: initialData?.content || '',
     featuredImage: initialData?.featuredImage || '',
-    tags: initialData?.tags || [],
-    categories: initialData?.categories || [],
     status: initialData?.status || 'DRAFT',
-    metaTitle: initialData?.metaTitle || '',
-    metaDescription: initialData?.metaDescription || '',
-    featured: initialData?.featured || false,
+  })
+
+  const [wordCount, setWordCount] = useState(() => {
+    const text = (initialData?.content || '').replace(/<[^>]*>/g, '')
+    return text.trim() ? text.trim().split(/\s+/).length : 0
   })
 
   const generateSlug = (title: string) => {
@@ -117,107 +72,86 @@ export function BlogPostEditor({ initialData, postId }: { initialData?: Partial<
     setFormData(prev => ({
       ...prev,
       title,
-      slug: prev.slug || generateSlug(title),
-      metaTitle: prev.metaTitle || title
+      slug: generateSlug(title),
     }))
   }
 
-  const addTag = (tag: string) => {
-    if (tag && !formData.tags.includes(tag)) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, tag]
-      }))
-    }
-    setNewTag('')
+  const handleContentChange = (content: string) => {
+    setFormData(prev => ({ ...prev, content }))
+    const text = content.replace(/<[^>]*>/g, '')
+    setWordCount(text.trim() ? text.trim().split(/\s+/).length : 0)
   }
 
-  const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }))
-  }
-
-  const addCategory = (category: string) => {
-    if (category && !formData.categories.includes(category)) {
-      setFormData(prev => ({
-        ...prev,
-        categories: [...prev.categories, category]
-      }))
-    }
-    setNewCategory('')
-  }
-
-  const removeCategory = (categoryToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      categories: prev.categories.filter(cat => cat !== categoryToRemove)
-    }))
-  }
-
-  const insertTextAtCursor = (text: string) => {
+  const wrapSelection = useCallback((before: string, after: string) => {
     const textarea = contentRef.current
     if (!textarea) return
 
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
-    const currentContent = formData.content
-    const newContent = currentContent.slice(0, start) + text + currentContent.slice(end)
+    const selected = formData.content.slice(start, end)
+    const newContent = formData.content.slice(0, start) + before + selected + after + formData.content.slice(end)
 
     setFormData(prev => ({ ...prev, content: newContent }))
+    handleContentChange(newContent)
 
-    // Set cursor position after the inserted text
     setTimeout(() => {
       textarea.focus()
-      textarea.setSelectionRange(start + text.length, start + text.length)
+      if (selected) {
+        textarea.setSelectionRange(start + before.length, end + before.length)
+      } else {
+        textarea.setSelectionRange(start + before.length, start + before.length)
+      }
     }, 0)
-  }
+  }, [formData.content])
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
+  const handleImageUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file')
-      event.target.value = ''
       return
     }
 
-    // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert('Image size must be less than 5MB')
-      event.target.value = ''
       return
     }
 
+    setIsUploading(true)
     try {
-      const formData = new FormData()
-      formData.append('file', file)
+      const uploadData = new FormData()
+      uploadData.append('file', file)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        body: uploadData,
       })
 
       if (response.ok) {
         const result = await response.json()
         setFormData(prev => ({ ...prev, featuredImage: result.url }))
-        console.log('Image uploaded successfully:', result.url)
       } else {
         const error = await response.json()
-        console.error('Upload failed:', error)
         alert(`Failed to upload image: ${error.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Image upload failed:', error)
       alert('Failed to upload image. Please try again.')
+    } finally {
+      setIsUploading(false)
     }
+  }
 
-    // Reset file input
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) handleImageUpload(file)
     event.target.value = ''
   }
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleImageUpload(file)
+  }, [])
 
   const handleSubmit = async (status: 'DRAFT' | 'PUBLISHED') => {
     if (!formData.title || !formData.content) {
@@ -242,7 +176,6 @@ export function BlogPostEditor({ initialData, postId }: { initialData?: Partial<
       if (response.ok) {
         const data = await response.json()
 
-        // Show newsletter dialog if publishing (new or updated post)
         if (status === 'PUBLISHED') {
           setPendingPublishData(data)
           setShowNewsletterDialog(true)
@@ -293,390 +226,192 @@ export function BlogPostEditor({ initialData, postId }: { initialData?: Partial<
     router.push('/dashboard/admin/blog')
   }
 
+  const toolbarButtons = [
+    { icon: Heading1, action: () => wrapSelection('<h1>', '</h1>'), label: 'Heading 1', group: 'heading' },
+    { icon: Heading2, action: () => wrapSelection('<h2>', '</h2>'), label: 'Heading 2', group: 'heading' },
+    { icon: Heading3, action: () => wrapSelection('<h3>', '</h3>'), label: 'Heading 3', group: 'heading' },
+    { icon: null, action: () => {}, label: 'divider', group: 'div1' },
+    { icon: Bold, action: () => wrapSelection('<strong>', '</strong>'), label: 'Bold', group: 'format' },
+    { icon: Italic, action: () => wrapSelection('<em>', '</em>'), label: 'Italic', group: 'format' },
+    { icon: Underline, action: () => wrapSelection('<u>', '</u>'), label: 'Underline', group: 'format' },
+    { icon: null, action: () => {}, label: 'divider', group: 'div2' },
+    { icon: List, action: () => wrapSelection('<ul>\n  <li>', '</li>\n</ul>'), label: 'Bullet List', group: 'block' },
+    { icon: Quote, action: () => wrapSelection('<blockquote>', '</blockquote>'), label: 'Quote', group: 'block' },
+    { icon: Code, action: () => wrapSelection('<code>', '</code>'), label: 'Code', group: 'block' },
+    { icon: null, action: () => {}, label: 'divider', group: 'div3' },
+    { icon: Link, action: () => wrapSelection('<a href="">', '</a>'), label: 'Link', group: 'insert' },
+    { icon: ImageIcon, action: () => wrapSelection('<img src="', '" alt="" />'), label: 'Image', group: 'insert' },
+  ]
+
   return (
-    <div className="space-y-8">
-      {/* Main Content Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Blog Post Content</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="Enter blog post title"
-              className="text-lg"
-            />
-          </div>
-
-          {/* Slug */}
-          <div className="space-y-2">
-            <Label htmlFor="slug">URL Slug *</Label>
-            <Input
-              id="slug"
-              value={formData.slug}
-              onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-              placeholder="url-friendly-slug"
-            />
-            <p className="text-sm text-gray-500">
-              URL: /blog/{formData.slug}
-            </p>
-          </div>
-
-          {/* Excerpt */}
-          <div className="space-y-2">
-            <Label htmlFor="excerpt">Excerpt</Label>
-            <Textarea
-              id="excerpt"
-              value={formData.excerpt}
-              onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-              placeholder="Brief description of the post (optional)"
-              rows={3}
-            />
-          </div>
-
-          {/* Featured Image */}
-          <div className="space-y-2">
-            <Label>Featured Image</Label>
-            {formData.featuredImage ? (
-              <div className="space-y-2">
-                <div className="relative w-full max-w-2xl rounded-lg overflow-hidden border-2 border-gray-200">
-                  <img
-                    src={formData.featuredImage}
-                    alt="Featured"
-                    className="w-full h-auto max-h-96 object-contain bg-gray-50"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
-                  >
-                    <X className="w-4 h-4 mr-1" />
-                    Remove
-                  </Button>
-                </div>
-                <p className="text-sm text-gray-500">
-                  Image URL: {formData.featuredImage}
-                </p>
-              </div>
-            ) : (
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="featured-image"
-                />
-                <label htmlFor="featured-image">
-                  <Button variant="outline" className="cursor-pointer" asChild>
-                    <span>
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Featured Image
-                    </span>
-                  </Button>
-                </label>
-                <p className="text-sm text-gray-500 mt-2">
-                  Upload an image (max 5MB). Recommended size: 1200x630px
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Rich Text Editor Toolbar */}
-          <div className="space-y-2">
-            <Label>Content *</Label>
-            <div className="border rounded-md">
-              {/* Toolbar */}
-              <div className="flex items-center space-x-1 p-2 border-b bg-gray-50">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<h1></h1>')}
-                  title="Heading 1"
-                >
-                  <Heading1 className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<h2></h2>')}
-                  title="Heading 2"
-                >
-                  <Heading2 className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<h3></h3>')}
-                  title="Heading 3"
-                >
-                  <Heading3 className="w-4 h-4" />
-                </Button>
-                <div className="w-px h-6 bg-gray-300" />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<strong></strong>')}
-                  title="Bold"
-                >
-                  <Bold className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<em></em>')}
-                  title="Italic"
-                >
-                  <Italic className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<u></u>')}
-                  title="Underline"
-                >
-                  <Underline className="w-4 h-4" />
-                </Button>
-                <div className="w-px h-6 bg-gray-300" />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<ul><li></li></ul>')}
-                  title="Bullet List"
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<a href=""></a>')}
-                  title="Link"
-                >
-                  <Link className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<img src="" alt="" />')}
-                  title="Image"
-                >
-                  <ImageIcon className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<code></code>')}
-                  title="Inline Code"
-                >
-                  <Code className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertTextAtCursor('<blockquote></blockquote>')}
-                  title="Quote"
-                >
-                  <Quote className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {/* Content Textarea */}
-              <Textarea
-                ref={contentRef}
-                value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Write your blog post content here. You can use HTML tags for formatting."
-                rows={20}
-                className="border-0 resize-none focus:ring-0 font-mono text-sm"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Sidebar Settings */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Categories & Tags */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Categories & Tags</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Categories */}
-            <div className="space-y-2">
-              <Label>Categories</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.categories.map((category) => (
-                  <Badge key={category} variant="secondary" className="flex items-center gap-1">
-                    {category}
-                    <X
-                      className="w-3 h-3 cursor-pointer"
-                      onClick={() => removeCategory(category)}
-                    />
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="Add category"
-                  onKeyPress={(e) => e.key === 'Enter' && addCategory(newCategory)}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => addCategory(newCategory)}
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {PREDEFINED_CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => addCategory(category)}
-                    className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Tags */}
-            <div className="space-y-2">
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                    {tag}
-                    <X
-                      className="w-3 h-3 cursor-pointer"
-                      onClick={() => removeTag(tag)}
-                    />
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  placeholder="Add tag"
-                  onKeyPress={(e) => e.key === 'Enter' && addTag(newTag)}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => addTag(newTag)}
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {PREDEFINED_TAGS.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => addTag(tag)}
-                    className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* SEO & Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>SEO & Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Featured Toggle */}
-            <div className="flex items-center space-x-2">
-              <Switch
-                checked={formData.featured}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, featured: checked }))}
-              />
-              <Label>Featured Post</Label>
-            </div>
-
-            {/* Meta Title */}
-            <div className="space-y-2">
-              <Label htmlFor="metaTitle">Meta Title</Label>
-              <Input
-                id="metaTitle"
-                value={formData.metaTitle}
-                onChange={(e) => setFormData(prev => ({ ...prev, metaTitle: e.target.value }))}
-                placeholder="SEO title (optional)"
-              />
-            </div>
-
-            {/* Meta Description */}
-            <div className="space-y-2">
-              <Label htmlFor="metaDescription">Meta Description</Label>
-              <Textarea
-                id="metaDescription"
-                value={formData.metaDescription}
-                onChange={(e) => setFormData(prev => ({ ...prev, metaDescription: e.target.value }))}
-                placeholder="SEO description (optional)"
-                rows={3}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-between">
-        <Button
-          variant="outline"
+    <div className="space-y-6">
+      {/* Top bar */}
+      <div className="flex items-center justify-between">
+        <button
           onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
         >
-          Cancel
-        </Button>
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
 
-        <div className="flex space-x-2">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-sm text-gray-400">
+            <FileText className="w-3.5 h-3.5" />
+            <span>{wordCount} words</span>
+          </div>
+
           <Button
             variant="outline"
+            size="sm"
             onClick={() => handleSubmit('DRAFT')}
             disabled={isSubmitting}
+            className="border-gray-200 hover:bg-gray-50"
           >
-            <Save className="w-4 h-4 mr-2" />
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
             {postId ? 'Update Draft' : 'Save Draft'}
           </Button>
+
           <Button
+            size="sm"
             onClick={() => handleSubmit('PUBLISHED')}
             disabled={isSubmitting}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
           >
-            <Eye className="w-4 h-4 mr-2" />
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Eye className="w-4 h-4 mr-2" />
+            )}
             {postId ? 'Update & Publish' : 'Publish'}
           </Button>
         </div>
+      </div>
+
+      {/* Title */}
+      <div>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => handleTitleChange(e.target.value)}
+          placeholder="Post title..."
+          className="w-full text-4xl font-bold text-gray-900 placeholder-gray-300 border-0 outline-none bg-transparent focus:ring-0 p-0"
+        />
+        {formData.slug && (
+          <p className="mt-2 text-sm text-gray-400">
+            startexus.com/blog/<span className="text-gray-500">{formData.slug}</span>
+          </p>
+        )}
+      </div>
+
+      {/* Featured Image */}
+      <div>
+        {formData.featuredImage ? (
+          <div className="relative group rounded-xl overflow-hidden">
+            <img
+              src={formData.featuredImage}
+              alt="Featured"
+              className="w-full h-72 object-cover"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white text-gray-700"
+                onClick={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
+              >
+                <X className="w-4 h-4 mr-1.5" />
+                Remove Image
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            className={`relative rounded-xl border-2 border-dashed transition-all duration-200 ${
+              isDragging
+                ? 'border-blue-400 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'
+            }`}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileInput}
+              className="hidden"
+              id="featured-image"
+            />
+            <label htmlFor="featured-image" className="flex flex-col items-center justify-center py-12 cursor-pointer">
+              {isUploading ? (
+                <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-3" />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                  <Upload className="w-5 h-5 text-gray-400" />
+                </div>
+              )}
+              <p className="text-sm font-medium text-gray-600">
+                {isUploading ? 'Uploading...' : 'Drop an image here or click to upload'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Recommended: 1200 x 630px, max 5MB
+              </p>
+            </label>
+          </div>
+        )}
+      </div>
+
+      {/* Content Editor */}
+      <div className="rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm">
+        {/* Toolbar */}
+        <div className="flex items-center gap-0.5 px-3 py-2 border-b border-gray-100 bg-gray-50/80">
+          {toolbarButtons.map((btn, i) => {
+            if (!btn.icon) {
+              return <div key={`div-${i}`} className="w-px h-5 bg-gray-200 mx-1" />
+            }
+            const Icon = btn.icon
+            return (
+              <button
+                key={btn.label}
+                type="button"
+                onClick={() => {
+                  btn.action()
+                  setActiveToolbar(btn.label)
+                  setTimeout(() => setActiveToolbar(null), 200)
+                }}
+                title={btn.label}
+                className={`p-1.5 rounded-md transition-all duration-150 ${
+                  activeToolbar === btn.label
+                    ? 'bg-blue-100 text-blue-600'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Textarea */}
+        <Textarea
+          ref={contentRef}
+          value={formData.content}
+          onChange={(e) => handleContentChange(e.target.value)}
+          placeholder="Start writing your story..."
+          rows={24}
+          className="border-0 resize-none focus:ring-0 focus-visible:ring-0 font-mono text-sm leading-relaxed p-4"
+        />
+      </div>
+
+      {/* Bottom hint */}
+      <div className="flex items-center gap-2 text-xs text-gray-400">
+        <Sparkles className="w-3.5 h-3.5" />
+        <span>Categories, tags, and SEO metadata will be auto-generated when you save.</span>
       </div>
 
       {/* Newsletter Confirmation Dialog */}
