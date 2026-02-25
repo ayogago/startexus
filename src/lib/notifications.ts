@@ -48,7 +48,7 @@ export async function createNotification({
                 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f7fafc; }
                 .container { max-width: 600px; margin: 0 auto; background-color: white; }
                 .header { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 30px; text-align: center; }
-                .logo { color: white; font-size: 24px; font-weight: bold; }
+                .logo { margin-bottom: 10px; }
                 .content { padding: 30px; }
                 .title { color: #1a202c; font-size: 22px; font-weight: bold; margin-bottom: 15px; }
                 .message { color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 25px; }
@@ -58,7 +58,7 @@ export async function createNotification({
             </head>
             <body>
               <div class="container">
-                <div class="header"><div class="logo">StartExus</div></div>
+                <div class="header"><div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="180" style="display:block;margin:0 auto;" /></div></div>
                 <div class="content">
                   <h1 class="title">${title}</h1>
                   <p class="message">${message}</p>

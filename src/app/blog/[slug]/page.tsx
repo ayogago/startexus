@@ -201,7 +201,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       "name": "StartExus",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://startexus.com/logo.svg"
+        "url": "https://startexus.com/startexus-light.png"
       }
     },
     "mainEntityOfPage": {

@@ -27,20 +27,14 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 flex-shrink-0">
-            <div className="w-10 h-10 flex-shrink-0 relative">
-              <Image
-                src="/logo.svg"
-                alt="StartExus Logo"
-                width={40}
-                height={40}
-                priority
-              />
-            </div>
-            <div>
-              <span className="font-bold text-xl text-gray-900">StartExus</span>
-              <div className="text-xs text-blue-600 font-medium -mt-1">Business Marketplace</div>
-            </div>
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <Image
+              src="/startexus-light.png"
+              alt="StartExus Logo"
+              width={180}
+              height={48}
+              priority
+            />
           </Link>
 
           {/* Navigation Menu */}

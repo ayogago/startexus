@@ -43,7 +43,7 @@ export const emailTemplates = {
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f7fafc; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; }
           .header { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 40px 30px; text-align: center; }
-          .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+          .logo { margin-bottom: 10px; }
           .header-text { color: white; font-size: 16px; opacity: 0.9; }
           .content { padding: 40px 30px; }
           .welcome-title { color: #1a202c; font-size: 28px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -61,7 +61,7 @@ export const emailTemplates = {
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">StartExus</div>
+            <div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="180" style="display:block;margin:0 auto;" /></div>
             <div class="header-text">Business Marketplace</div>
           </div>
 
@@ -158,7 +158,7 @@ export const emailTemplates = {
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f7fafc; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; }
           .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center; }
-          .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+          .logo { margin-bottom: 10px; }
           .header-text { color: white; font-size: 16px; opacity: 0.9; }
           .content { padding: 40px 30px; }
           .title { color: #1a202c; font-size: 28px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -174,7 +174,7 @@ export const emailTemplates = {
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">StartExus</div>
+            <div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="180" style="display:block;margin:0 auto;" /></div>
             <div class="header-text">Business Marketplace</div>
           </div>
 
@@ -251,7 +251,7 @@ export const emailTemplates = {
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f7fafc; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; }
           .header { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 40px 30px; text-align: center; }
-          .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+          .logo { margin-bottom: 10px; }
           .header-text { color: white; font-size: 16px; opacity: 0.9; }
           .content { padding: 40px 30px; }
           .title { color: #1a202c; font-size: 28px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -268,7 +268,7 @@ export const emailTemplates = {
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">StartExus</div>
+            <div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="180" style="display:block;margin:0 auto;" /></div>
             <div class="header-text">Business Marketplace</div>
           </div>
 
@@ -426,7 +426,7 @@ export async function sendAdminListingNotification(listingData: {
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f7fafc; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; }
         .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 30px; text-align: center; }
-        .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .logo { margin-bottom: 10px; }
         .header-text { color: white; font-size: 16px; opacity: 0.9; }
         .content { padding: 40px 30px; }
         .title { color: #1a202c; font-size: 28px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -444,7 +444,7 @@ export async function sendAdminListingNotification(listingData: {
     <body>
       <div class="container">
         <div class="header">
-          <div class="logo">StartExus</div>
+          <div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="180" style="display:block;margin:0 auto;" /></div>
           <div class="header-text">Admin Notification</div>
         </div>
 
