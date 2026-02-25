@@ -65,6 +65,17 @@ model User {
   reports           Report[]
   blogPosts         BlogPost[]
   blogComments      BlogComment[]
+  notifications     Notification[]
+  reviewsGiven      Review[]       @relation("ReviewAuthor")
+  reviewsReceived   Review[]       @relation("ReviewTarget")
+  savedSearches     SavedSearch[]
+  dealsAsBuyer      Deal[]         @relation("DealBuyer")
+  dealsAsSeller     Deal[]         @relation("DealSeller")
+  documents         DealDocument[] @relation("DocumentUploader")
+  scheduledCalls    ScheduledCall[] @relation("CallScheduler")
+  scheduledCallsReceived ScheduledCall[] @relation("CallReceiver")
+  verificationRequests   UserVerification[]
+  auditLogs         AuditLog[]
 }
 
 model VerificationToken {
@@ -123,6 +134,9 @@ model Listing {
   rejectionReason   String?
   savedListings     SavedListing[]
   threads           Thread[]
+  reviews           Review[]
+  deals             Deal[]
+  viewEvents        ViewEvent[]
 }
 
 model ListingImage {
@@ -270,4 +284,172 @@ model NewsletterEmail {
   openedAt      DateTime?
   clickedAt     DateTime?
   clickedLinks  String   @default("[]")
+}
+
+// ========== NEW FEATURE MODELS ==========
+
+model Notification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // MESSAGE, LISTING_APPROVED, LISTING_REJECTED, DEAL_UPDATE, REVIEW, SAVED_ALERT, VERIFICATION
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  data      String   @default("{}") // JSON metadata
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  authorId   String
+  author     User     @relation("ReviewAuthor", fields: [authorId], references: [id])
+  targetId   String
+  target     User     @relation("ReviewTarget", fields: [targetId], references: [id])
+  listingId  String?
+  listing    Listing? @relation(fields: [listingId], references: [id])
+  dealId     String?
+  deal       Deal?    @relation(fields: [dealId], references: [id])
+  rating     Int      // 1-5
+  title      String
+  content    String
+  response   String?  // Seller can respond
+  respondedAt DateTime?
+  status     String   @default("PUBLISHED") // PUBLISHED, HIDDEN, FLAGGED
+
+  @@unique([authorId, dealId])
+  @@index([targetId])
+}
+
+model SavedSearch {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  filters    String   @default("{}") // JSON: {type, minPrice, maxPrice, minMRR, etc.}
+  emailAlert Boolean  @default(true)
+  lastNotifiedAt DateTime?
+
+  @@index([userId])
+}
+
+model Deal {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id])
+  buyerId     String
+  buyer       User     @relation("DealBuyer", fields: [buyerId], references: [id])
+  sellerId    String
+  seller      User     @relation("DealSeller", fields: [sellerId], references: [id])
+  stage       String   @default("INQUIRY") // INQUIRY, OFFER, NEGOTIATION, DUE_DILIGENCE, CLOSING, COMPLETED, CANCELLED
+  offerAmount Int?
+  notes       String?
+  threadId    String?
+  documents   DealDocument[]
+  reviews     Review[]
+  calls       ScheduledCall[]
+  timeline    DealEvent[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([listingId])
+}
+
+model DealEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  dealId    String
+  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  type      String   // STAGE_CHANGE, NOTE, DOCUMENT_ADDED, OFFER_MADE, CALL_SCHEDULED
+  title     String
+  details   String?
+  actorId   String?
+}
+
+model DealDocument {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  dealId      String
+  deal        Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  uploaderId  String
+  uploader    User     @relation("DocumentUploader", fields: [uploaderId], references: [id])
+  name        String
+  fileUrl     String
+  fileType    String
+  fileSize    Int
+  category    String   @default("OTHER") // FINANCIALS, LEGAL, ANALYTICS, CONTRACTS, OTHER
+  description String?
+
+  @@index([dealId])
+}
+
+model ScheduledCall {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  schedulerId  String
+  scheduler    User     @relation("CallScheduler", fields: [schedulerId], references: [id])
+  receiverId   String
+  receiver     User     @relation("CallReceiver", fields: [receiverId], references: [id])
+  dealId       String?
+  deal         Deal?    @relation(fields: [dealId], references: [id])
+  scheduledAt  DateTime
+  duration     Int      @default(30) // minutes
+  title        String
+  notes        String?
+  meetingLink  String?
+  status       String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+
+  @@index([schedulerId])
+  @@index([receiverId])
+}
+
+model UserVerification {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String   // IDENTITY, BUSINESS, FUNDS
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  documentUrl String?
+  notes       String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+
+  @@index([userId])
+}
+
+model ViewEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  visitorIp String?
+  referrer  String?
+
+  @@index([listingId, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String   // LISTING_APPROVED, LISTING_REJECTED, USER_DISABLED, USER_VERIFIED, etc.
+  targetType String  // LISTING, USER, REPORT, etc.
+  targetId  String
+  details   String?
+  ipAddress String?
+
+  @@index([userId])
+  @@index([targetType, targetId])
 }

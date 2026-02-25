@@ -48,11 +48,18 @@ async function getListing(slug: string, userId?: string) {
     return null
   }
 
-  // Increment view count
-  await prisma.listing.update({
-    where: { id: listing.id },
-    data: { views: { increment: 1 } },
-  })
+  // Increment view count and create view event for analytics
+  await Promise.all([
+    prisma.listing.update({
+      where: { id: listing.id },
+      data: { views: { increment: 1 } },
+    }),
+    prisma.viewEvent.create({
+      data: {
+        listingId: listing.id,
+      },
+    }).catch(() => {}),
+  ])
 
   // Parse JSON fields for SQLite
   const processedListing = {

@@ -140,27 +140,30 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    // Get unread message counts for each thread
-    const threadsWithUnread = await Promise.all(
-      threads.map(async (thread) => {
-        const messages = await prisma.message.findMany({
+    // Get unread counts in a single batch query instead of N+1
+    const threadIds = threads.map(t => t.id)
+    const allUnreadMessages = threadIds.length > 0
+      ? await prisma.message.findMany({
           where: {
-            threadId: thread.id,
+            threadId: { in: threadIds },
             senderId: { not: session.user.id },
           },
+          select: { threadId: true, readBy: true },
         })
+      : []
 
-        const unreadCount = messages.filter(message => {
-          const readBy = JSON.parse(message.readBy || '[]')
-          return !readBy.includes(session.user.id)
-        }).length
+    const unreadCounts = new Map<string, number>()
+    for (const msg of allUnreadMessages) {
+      const readBy = JSON.parse(msg.readBy || '[]')
+      if (!readBy.includes(session.user.id)) {
+        unreadCounts.set(msg.threadId, (unreadCounts.get(msg.threadId) || 0) + 1)
+      }
+    }
 
-        return {
-          ...thread,
-          unreadCount,
-        }
-      })
-    )
+    const threadsWithUnread = threads.map(thread => ({
+      ...thread,
+      unreadCount: unreadCounts.get(thread.id) || 0,
+    }))
 
     return NextResponse.json({ threads: threadsWithUnread })
   } catch (error) {

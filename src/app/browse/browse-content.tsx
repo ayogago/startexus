@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { ListingImage } from '@/components/ui/listing-image'
 import { getPlaceholderImage } from '@/lib/placeholder-images'
+import { CompareButton } from '@/components/compare/compare-button'
+import { SaveSearchButton } from '@/components/browse/save-search-button'
 import { Filter, Heart, Search, Star, X, Zap, Clock, DollarSign, TrendingUp, Users, Globe, Sparkles } from 'lucide-react'
 
 interface Listing {
@@ -20,7 +22,10 @@ interface Listing {
   askingPrice: number | null
   mrr: number | null
   revenueTtm: number | null
+  profitTtm: number | null
   trafficTtm: number | null
+  workloadHrsPerWk: number | null
+  teamSize: number | null
   highlights: string[]
   images: { url: string; alt: string | null }[]
   featured: boolean
@@ -415,16 +420,21 @@ export function BrowseContent() {
 
       {/* Listings Grid */}
       <div className="flex-1">
-        {/* Mobile Filter Toggle */}
-        <div className="lg:hidden mb-4">
-          <Button
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-            className="w-full"
-          >
-            <Filter className="w-4 h-4 mr-2" />
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
-          </Button>
+        {/* Toolbar: Mobile Filter Toggle + Save Search */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="lg:hidden flex-1">
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+              className="w-full"
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </Button>
+          </div>
+          <div className="ml-auto">
+            <SaveSearchButton />
+          </div>
         </div>
 
         {loading ? (
@@ -483,9 +493,27 @@ export function BrowseContent() {
                       <div className="flex items-center space-x-2">
                         <Badge variant="outline">{listing.businessType}</Badge>
                       </div>
-                      <div className="flex items-center space-x-1 text-sm text-gray-500">
-                        <Heart className="w-4 h-4" />
-                        <span>{listing._count.savedListings}</span>
+                      <div className="flex items-center space-x-2">
+                        <CompareButton
+                          listing={{
+                            id: listing.id,
+                            title: listing.title,
+                            businessType: listing.businessType,
+                            askingPrice: listing.askingPrice,
+                            mrr: listing.mrr,
+                            revenueTtm: listing.revenueTtm,
+                            profitTtm: listing.profitTtm,
+                            trafficTtm: listing.trafficTtm,
+                            workloadHrsPerWk: listing.workloadHrsPerWk,
+                            teamSize: listing.teamSize,
+                            slug: listing.slug,
+                            imageUrl: listing.images?.[0]?.url,
+                          }}
+                        />
+                        <div className="flex items-center space-x-1 text-sm text-gray-500">
+                          <Heart className="w-4 h-4" />
+                          <span>{listing._count.savedListings}</span>
+                        </div>
                       </div>
                     </div>
                     <CardTitle className="text-lg line-clamp-2">

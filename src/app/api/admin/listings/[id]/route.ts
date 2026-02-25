@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { logAuditEvent } from '@/lib/audit'
 
 interface RouteContext {
   params: {
@@ -150,6 +151,48 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       },
     })
 
+    // Audit logging for admin actions
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') || undefined
+
+    if (body.status === 'PUBLISHED') {
+      await logAuditEvent({
+        userId: session.user.id,
+        action: 'LISTING_APPROVED',
+        targetType: 'LISTING',
+        targetId: listingId,
+        details: `Listing "${listing.title}" approved and published`,
+        ipAddress: ip,
+      })
+    } else if (body.status === 'REJECTED') {
+      await logAuditEvent({
+        userId: session.user.id,
+        action: 'LISTING_REJECTED',
+        targetType: 'LISTING',
+        targetId: listingId,
+        details: `Listing "${listing.title}" rejected`,
+        ipAddress: ip,
+      })
+    } else if (body.hasOwnProperty('featured')) {
+      await logAuditEvent({
+        userId: session.user.id,
+        action: body.featured ? 'LISTING_FEATURED' : 'LISTING_UNFEATURED',
+        targetType: 'LISTING',
+        targetId: listingId,
+        details: `Listing "${listing.title}" ${body.featured ? 'featured' : 'unfeatured'}`,
+        ipAddress: ip,
+      })
+    } else {
+      await logAuditEvent({
+        userId: session.user.id,
+        action: 'LISTING_UPDATED',
+        targetType: 'LISTING',
+        targetId: listingId,
+        details: `Listing "${listing.title}" updated by admin`,
+        ipAddress: ip,
+      })
+    }
+
     return NextResponse.json({ listing })
   } catch (error) {
     console.error('Failed to update listing:', error)
@@ -182,6 +225,19 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
     // Delete the listing
     await prisma.listing.delete({
       where: { id: listingId }
+    })
+
+    // Audit logging for listing deletion
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') || undefined
+
+    await logAuditEvent({
+      userId: session.user.id,
+      action: 'LISTING_DELETED',
+      targetType: 'LISTING',
+      targetId: listingId,
+      details: `Listing deleted by admin`,
+      ipAddress: ip,
     })
 
     return NextResponse.json({ success: true })

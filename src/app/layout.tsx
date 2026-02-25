@@ -2,8 +2,10 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { SessionProvider } from '@/components/providers/session-provider'
+import { CompareProvider } from '@/components/compare/compare-provider'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
+import { CompareBar } from '@/components/compare/compare-bar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -162,13 +164,16 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <SessionProvider>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <CompareProvider>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+              <CompareBar />
+            </div>
+          </CompareProvider>
         </SessionProvider>
       </body>
     </html>
