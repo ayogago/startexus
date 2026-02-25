@@ -7,16 +7,116 @@ import { z } from 'zod'
 const updateBlogPostSchema = z.object({
   title: z.string().min(1, 'Title is required').optional(),
   slug: z.string().min(1, 'Slug is required').optional(),
-  excerpt: z.string().optional(),
   content: z.string().min(1, 'Content is required').optional(),
   featuredImage: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  categories: z.array(z.string()).optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
-  featured: z.boolean().optional(),
 })
+
+const PREDEFINED_TAGS = [
+  'online business',
+  'acquisition',
+  'investment',
+  'due diligence',
+  'valuation',
+  'saas',
+  'ecommerce',
+  'ai',
+  'passive income',
+  'entrepreneurship',
+  'digital assets',
+  'roi',
+  'growth',
+  'startup',
+  'exit strategy',
+]
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function generateExcerpt(content: string): string {
+  const plainText = stripHtml(content)
+  if (plainText.length <= 160) return plainText
+  return plainText.slice(0, 157).replace(/\s+\S*$/, '') + '...'
+}
+
+function generateMetaDescription(title: string, content: string): string {
+  const plainText = stripHtml(content)
+  const desc = plainText.slice(0, 155).replace(/\s+\S*$/, '')
+  return desc.length < plainText.length ? desc + '...' : desc
+}
+
+function generateCategories(title: string, content: string): string[] {
+  const text = (title + ' ' + stripHtml(content)).toLowerCase()
+  const matched: string[] = []
+
+  const categoryKeywords: Record<string, string[]> = {
+    'Business Acquisition': ['acquisition', 'acquire', 'buying a business', 'purchase', 'buy a business', 'deal'],
+    'Due Diligence': ['due diligence', 'audit', 'investigation', 'verify', 'assessment', 'risk analysis'],
+    'Valuation': ['valuation', 'value', 'worth', 'pricing', 'appraisal', 'multiple', 'revenue multiple'],
+    'SaaS': ['saas', 'software as a service', 'subscription', 'mrr', 'arr', 'recurring revenue', 'churn'],
+    'E-commerce': ['ecommerce', 'e-commerce', 'online store', 'shopify', 'amazon', 'dropshipping', 'retail'],
+    'AI & Technology': ['ai', 'artificial intelligence', 'machine learning', 'technology', 'automation', 'tech', 'gpt', 'llm'],
+    'Investment Tips': ['invest', 'investment', 'tips', 'strategy', 'portfolio', 'returns', 'roi', 'profit'],
+    'Case Studies': ['case study', 'case studies', 'example', 'real-world', 'success story', 'how we', 'lessons learned'],
+    'Market Analysis': ['market', 'analysis', 'trend', 'industry', 'forecast', 'report', 'data', 'statistics'],
+    'Success Stories': ['success', 'story', 'journey', 'achieved', 'grew', 'scaled', 'milestone', 'transformation'],
+  }
+
+  for (const [category, keywords] of Object.entries(categoryKeywords)) {
+    if (keywords.some(kw => text.includes(kw))) {
+      matched.push(category)
+    }
+  }
+
+  if (matched.length === 0) {
+    matched.push('Investment Tips')
+  }
+
+  return matched.slice(0, 3)
+}
+
+function generateTags(title: string, content: string): string[] {
+  const text = (title + ' ' + stripHtml(content)).toLowerCase()
+  const matched: string[] = []
+
+  for (const tag of PREDEFINED_TAGS) {
+    if (text.includes(tag)) {
+      matched.push(tag)
+    }
+  }
+
+  const extraMappings: Record<string, string> = {
+    'saas': 'saas',
+    'e-commerce': 'ecommerce',
+    'ecommerce': 'ecommerce',
+    'artificial intelligence': 'ai',
+    'machine learning': 'ai',
+    'invest': 'investment',
+    'acquire': 'acquisition',
+    'startup': 'startup',
+    'entrepreneur': 'entrepreneurship',
+    'passive income': 'passive income',
+    'digital': 'digital assets',
+    'growth': 'growth',
+    'roi': 'roi',
+    'exit': 'exit strategy',
+    'due diligence': 'due diligence',
+    'valuation': 'valuation',
+  }
+
+  for (const [keyword, tag] of Object.entries(extraMappings)) {
+    if (text.includes(keyword) && !matched.includes(tag)) {
+      matched.push(tag)
+    }
+  }
+
+  if (matched.length === 0) {
+    matched.push('online business')
+  }
+
+  return Array.from(new Set(matched)).slice(0, 6)
+}
 
 export async function GET(
   request: NextRequest,
@@ -137,17 +237,18 @@ export async function PUT(
       publishedAt = new Date()
     }
 
+    // Auto-regenerate metadata from updated content
+    const title = validatedData.title || existingPost.title
+    const content = validatedData.content || existingPost.content
+
     const updateData: any = {
       ...validatedData,
       publishedAt,
-    }
-
-    // Stringify arrays for JSON storage
-    if (validatedData.tags) {
-      updateData.tags = JSON.stringify(validatedData.tags)
-    }
-    if (validatedData.categories) {
-      updateData.categories = JSON.stringify(validatedData.categories)
+      excerpt: generateExcerpt(content),
+      metaTitle: title,
+      metaDescription: generateMetaDescription(title, content),
+      tags: JSON.stringify(generateTags(title, content)),
+      categories: JSON.stringify(generateCategories(title, content)),
     }
 
     const updatedPost = await prisma.blogPost.update({
