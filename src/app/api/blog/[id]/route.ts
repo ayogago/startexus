@@ -115,7 +115,7 @@ function generateTags(title: string, content: string): string[] {
     matched.push('online business')
   }
 
-  return [...new Set(matched)].slice(0, 6)
+  return Array.from(new Set(matched)).slice(0, 6)
 }
 
 export async function GET(
