@@ -67,7 +67,7 @@ export async function POST(
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f7fafc; }
             .container { max-width: 600px; margin: 0 auto; background-color: white; }
             .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center; }
-            .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+            .logo { margin-bottom: 10px; }
             .header-text { color: white; font-size: 16px; opacity: 0.9; }
             .content { padding: 40px 30px; }
             .title { color: #1a202c; font-size: 28px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -82,7 +82,7 @@ export async function POST(
         <body>
           <div class="container">
             <div class="header">
-              <div class="logo">StartExus</div>
+              <div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="420" style="display:block;margin:0 auto;" /></div>
               <div class="header-text">Business Marketplace</div>
             </div>
 
@@ -128,7 +128,7 @@ export async function POST(
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f7fafc; }
             .container { max-width: 600px; margin: 0 auto; background-color: white; }
             .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 30px; text-align: center; }
-            .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+            .logo { margin-bottom: 10px; }
             .header-text { color: white; font-size: 16px; opacity: 0.9; }
             .content { padding: 40px 30px; }
             .title { color: #1a202c; font-size: 28px; font-weight: bold; margin-bottom: 20px; text-align: center; }
@@ -143,7 +143,7 @@ export async function POST(
         <body>
           <div class="container">
             <div class="header">
-              <div class="logo">StartExus</div>
+              <div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="420" style="display:block;margin:0 auto;" /></div>
               <div class="header-text">Business Marketplace</div>
             </div>
 

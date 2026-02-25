@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 function SignInContent() {
   const router = useRouter()
@@ -115,30 +116,8 @@ function SignInContent() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href="/" className="flex items-center justify-center space-x-3 mb-6">
-            <div className="relative">
-              {/* Modern geometric logo design */}
-              <div className="w-10 h-10 relative">
-                {/* Main circle */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full"></div>
-                {/* Inner geometric pattern */}
-                <div className="absolute inset-1 bg-white rounded-full flex items-center justify-center">
-                  <div className="relative w-6 h-6">
-                    {/* Stylized "S" using geometric shapes */}
-                    <div className="absolute top-0 left-0 w-3 h-2 bg-blue-600 rounded-tl-lg rounded-tr-lg"></div>
-                    <div className="absolute top-1 left-0 w-2 h-2 bg-blue-600 rounded-bl-lg"></div>
-                    <div className="absolute top-2 right-0 w-2 h-2 bg-blue-600 rounded-tr-lg"></div>
-                    <div className="absolute bottom-0 right-0 w-3 h-2 bg-blue-600 rounded-bl-lg rounded-br-lg"></div>
-                  </div>
-                </div>
-                {/* Small accent dot */}
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full border-2 border-white"></div>
-              </div>
-            </div>
-            <div className="text-center">
-              <span className="font-bold text-xl">StartExus</span>
-              <div className="text-xs text-blue-600 font-medium -mt-1">Business Marketplace</div>
-            </div>
+          <Link href="/" className="flex items-center justify-center mb-6">
+            <Image src="/startexus-light.png" alt="StartExus Logo" width={420} height={112} priority />
           </Link>
           <CardTitle>Sign in to your account</CardTitle>
           <CardDescription>

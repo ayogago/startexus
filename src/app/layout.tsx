@@ -81,17 +81,12 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/favicon.svg',
-        type: 'image/svg+xml',
-      },
-      {
-        url: '/favicon.ico',
-        sizes: '32x32',
-        type: 'image/x-icon',
+        url: '/startexus-light-favicon.png',
+        type: 'image/png',
       },
     ],
-    shortcut: '/favicon.ico',
-    apple: '/favicon.svg',
+    shortcut: '/startexus-light-favicon.png',
+    apple: '/startexus-light-favicon.png',
   },
 }
 
@@ -125,7 +120,7 @@ export default function RootLayout({
               "name": "StartExus",
               "alternateName": "StartExus Business Marketplace",
               "url": "https://startexus.com",
-              "logo": "https://startexus.com/favicon.svg",
+              "logo": "https://startexus.com/startexus-light.png",
               "description": "The marketplace for buying and selling online businesses, SaaS, ecommerce, and digital assets.",
               "foundingDate": "2023",
               "contactPoint": {

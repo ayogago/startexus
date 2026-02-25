@@ -7,14 +7,8 @@ export function Footer() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 flex-shrink-0">
-                <Image src="/logo.svg" alt="StartExus" width={120} height={32} />
-              </div>
-              <div>
-                <span className="font-bold text-xl">StartExus</span>
-                <div className="text-xs text-blue-600 font-medium -mt-1">Business Marketplace</div>
-              </div>
+            <div className="flex items-center mb-4">
+              <Image src="/startexus-light.png" alt="StartExus" width={420} height={112} />
             </div>
             <p className="text-gray-600 text-sm">
               The premier marketplace for buying and selling online businesses.
