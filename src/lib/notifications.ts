@@ -58,7 +58,7 @@ export async function createNotification({
             </head>
             <body>
               <div class="container">
-                <div class="header"><div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="240" style="display:block;margin:0 auto;" /></div></div>
+                <div class="header"><div class="logo"><img src="https://startexus.com/startexus-light.png" alt="StartExus" width="420" style="display:block;margin:0 auto;" /></div></div>
                 <div class="content">
                   <h1 class="title">${title}</h1>
                   <p class="message">${message}</p>
