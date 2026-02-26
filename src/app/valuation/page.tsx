@@ -74,7 +74,6 @@ export default function ValuationPage() {
   const [calculatedValuation, setCalculatedValuation] = useState<number | null>(null)
   const [showContactModal, setShowContactModal] = useState(false)
   const [contactData, setContactData] = useState({ fullName: '', email: '', phone: '', additionalInfo: '' })
-  const [modalType, setModalType] = useState<'instant' | 'full'>('full')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const steps = [
@@ -243,8 +242,6 @@ export default function ValuationPage() {
   }
 
   const handleSubmit = async () => {
-    // Open contact modal for full report
-    setModalType('full')
     setShowContactModal(true)
   }
 
@@ -280,7 +277,6 @@ export default function ValuationPage() {
         email: trimmedEmail,
         phone: contactData.phone,
         additionalInfo: contactData.additionalInfo,
-        instantSell: false,
         valuationAmount: calculatedValuation,
       }
 
@@ -294,68 +290,6 @@ export default function ValuationPage() {
 
       if (response.ok) {
         router.push('/valuation/thank-you')
-      } else {
-        setErrorMessage(responseData.error || 'Failed to submit')
-      }
-    } catch (error) {
-      setErrorMessage('An error occurred. Please try again.')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handleInstantSell = () => {
-    setModalType('instant')
-    setShowContactModal(true)
-  }
-
-  const handleInstantSellSubmit = async () => {
-    const trimmedName = contactData.fullName.trim()
-    const trimmedEmail = contactData.email.trim()
-
-    if (!trimmedName || !trimmedEmail) {
-      setErrorMessage('Please provide your name and email')
-      return
-    }
-
-    setSubmitting(true)
-    try {
-      // Submit valuation with instant sell flag and contact data
-      const payload = {
-        businessName: data.businessName,
-        businessType: data.businessType,
-        websiteUrl: normalizeUrl(data.websiteUrl),
-        monthlyRevenue: data.monthlyRevenue,
-        yearlyRevenue: data.yearlyRevenue,
-        profitMargin: data.profitMargin,
-        monthsEstablished: data.monthsEstablished,
-        primaryTrafficSource: data.primaryTrafficSource,
-        isAiRelated: data.isAiRelated,
-        sellTimeframe: data.sellTimeframe,
-        ownerInvolvement: data.ownerInvolvement,
-        monthlyTraffic: data.monthlyTraffic,
-        customerCount: data.customerCount,
-        growthRate: data.growthRate,
-        assets: data.assets,
-        liabilities: data.liabilities,
-        fullName: trimmedName,
-        email: trimmedEmail,
-        phone: contactData.phone,
-        additionalInfo: contactData.additionalInfo,
-        instantSell: true,
-        valuationAmount: calculatedValuation,
-      }
-
-      const response = await fetch('/api/valuation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      const responseData = await response.json()
-
-      if (response.ok) {
-        router.push('/valuation/instant-sell-thank-you')
       } else {
         setErrorMessage(responseData.error || 'Failed to submit')
       }
@@ -707,46 +641,6 @@ export default function ValuationPage() {
               <p className="text-gray-600">Based on the information you provided</p>
             </div>
 
-            {calculatedValuation && calculatedValuation <= 50000 && (
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-300 rounded-2xl p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="text-4xl">⚡</div>
-                  <div className="flex-1">
-                    <h4 className="text-xl font-bold text-gray-900 mb-3">Sell to Us Instantly!</h4>
-                    <p className="text-gray-700 mb-4">
-                      We're interested in buying your business right now. Get cash immediately with our instant buyout offer:
-                    </p>
-                    <div className="bg-white rounded-lg p-4 border-2 border-orange-400 mb-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-semibold text-gray-700">Instant Buyout Price:</span>
-                        <span className="text-3xl font-bold text-orange-600">
-                          {formatCurrency(calculatedValuation * 0.8)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-2">
-                        Immediate cash payment - no waiting, no hassle
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <Button
-                        onClick={handleInstantSell}
-                        className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-lg py-6"
-                      >
-                        💰 Sell Now for {formatCurrency(calculatedValuation * 0.8)}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={handleNext}
-                        className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 text-lg py-6"
-                      >
-                        List at Full Price
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h4 className="font-semibold text-blue-900 mb-3 flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5" />
@@ -900,9 +794,7 @@ export default function ValuationPage() {
               <div className="text-5xl mb-4">📞</div>
               <h2 className="text-2xl font-bold mb-2">How can we reach you?</h2>
               <p className="text-gray-600">
-                {modalType === 'instant'
-                  ? "We'll contact you to complete the sale"
-                  : "We'll send you a detailed valuation report"}
+                We'll send you a detailed valuation report
               </p>
             </div>
 
@@ -964,12 +856,9 @@ export default function ValuationPage() {
                 Cancel
               </Button>
               <Button
-                onClick={modalType === 'instant' ? handleInstantSellSubmit : handleFullReportSubmit}
+                onClick={handleFullReportSubmit}
                 disabled={submitting || !contactData.fullName.trim() || !contactData.email.trim()}
-                className={modalType === 'instant'
-                  ? "flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-                  : "flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                }
+                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
               >
                 {submitting ? 'Submitting...' : 'Submit'}
               </Button>

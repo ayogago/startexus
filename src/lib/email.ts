@@ -367,9 +367,12 @@ export async function sendEmail({
       text,
     })
 
+    console.log(`Email sent successfully to ${to}: ${info.messageId}`)
     return { success: true, messageId: info.messageId }
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : String(error) }
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error(`Failed to send email to ${to} (${subject}):`, errorMessage)
+    return { success: false, error: errorMessage }
   }
 }
 
