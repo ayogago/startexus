@@ -160,7 +160,7 @@ export function Header() {
                   Sign In
                 </Button>
                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700" asChild>
-                  <Link href="/valuation">Get Started</Link>
+                  <Link href="/auth/signup">Sign Up</Link>
                 </Button>
               </div>
             )}
@@ -253,7 +253,7 @@ export function Header() {
                       Sign In
                     </Button>
                     <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700" asChild>
-                      <Link href="/valuation">Get Started</Link>
+                      <Link href="/auth/signup">Sign Up</Link>
                     </Button>
                   </div>
                 )}

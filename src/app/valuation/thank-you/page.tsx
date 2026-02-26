@@ -144,18 +144,6 @@ function ThankYouContent() {
             </p>
           </div>
 
-          {/* Testimonial */}
-          <Card className="mt-12 bg-gray-50">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <div className="text-lg text-gray-600 mb-4 italic">
-                  "StartExus helped me understand the true value of my SaaS business. Their detailed analysis and expert guidance resulted in a sale price 40% higher than I initially expected."
-                </div>
-                <div className="font-medium text-gray-900">Sarah Chen</div>
-                <div className="text-sm text-gray-500">Founder, TechFlow Solutions - Sold for $2.3M</div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
